@@ -19,7 +19,7 @@
 
   /* Text: */
   --font: Monaco, monospace;
-  --heading-font: Monaco, monospace;
+  --heading-font: 'Handjet', monospace;
   --font-size: 20px;
 
   /* Other Settings: */
@@ -125,7 +125,7 @@ header {
 
 .header-title {
   font-family: var(--heading-font);
-  font-size: 1.5em;
+  font-size: 2em;
   font-weight: bold;
 }
 
@@ -158,7 +158,7 @@ aside {
 
 .sidebar-title {
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.5em;
   font-family: var(--heading-font);
 }
 
@@ -303,6 +303,13 @@ header nav ul li:last-child > a {
   padding-right: 0;
 }
 
+header nav a,
+header nav a:visited {
+  color: #ffffff;
+  text-shadow: 0 0 8px #ffffff, 0 0 16px var(--link-color);
+  text-decoration: none;
+}
+
 /* Subnavigation (Drop-Down): */
 
 header nav ul ul {
@@ -425,29 +432,12 @@ main h6:first-child {
   margin-top: 0;
 }
 
-main h1 {
-  font-size: 1.5em;
-}
-
-main h2 {
-  font-size: 1.4em;
-}
-
-main h3 {
-  font-size: 1.3em;
-}
-
-main h4 {
-  font-size: 1.2em;
-}
-
-main h5 {
-  font-size: 1.1em;
-}
-
-main h6 {
-  font-size: 1em;
-}
+main h1 { font-size: 2.5em; }   /* was 1.5em */
+main h2 { font-size: 2em; }   /* was 1.4em */
+main h3 { font-size: 1.6em; }   /* was 1.3em */
+main h4 { font-size: 1.4em; }   /* was 1.2em */
+main h5 { font-size: 1.2em; }   /* was 1.1em */
+main h6 { font-size: 1em; }     /* unchanged */
 
 /* COLUMNS: */
 
