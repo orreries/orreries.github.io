@@ -35,15 +35,32 @@
           </p>
 
           <h2>Key Findings</h2>
-          <ul>
-            <li>[Finding 1]</li>
-            <li>[Finding 2]</li>
-            <li>[Finding 3]</li>
-          </ul>
 
-          <h2>Visualizations</h2>
-         
-      <style>
+            <ol>
+              <li>
+                <strong>AAVE appears invisible in semantic embedding space:</strong>
+                Even when a script contains unmistakable AAVE terms and Black cultural rhetoric, the model collapses those linguistic features into generic English structures.
+              </li>
+              <li>
+                <strong>Topic overrides dialect:</strong>
+                The embeddings pick up on what is being talked about, not how it is being expressed. So movies about interpersonal chaos, family conflict, and humor score similarly, even if the language used is culturally specific.
+              </li>
+              <li>
+                <strong>AAVE is underrepresented in training data:</strong>
+                MiniLM was trained on the English corpora that is deemed the societal standard. As a result, AAVE patterns are treated as statistical noise, not meaningful signals.
+              </li>
+              <li>
+                <strong>Dialectal and cultural distinctions collapse into a single semantic space:</strong>
+                From the model's perspective, all these movies are just "comedy scripts about messy people," regardless of race, culture, or vernacular.
+              </li>
+              <li>
+                <strong>This extends beyond AAVE:</strong>
+                Other minoritized Englishes (Chicano English, Hawaiian Pidgin, Cajun English, Caribbean English, Appalachian English) would similarly be flattened.
+              </li>
+            </ol>
+
+          <h2>Visualizations</h2>        
+       <style>
         * { box-sizing: border-box; }
         .wrap { font-family: Monaco, monospace; padding: 1rem 0; }
         .tab-bar { display: flex; gap: 0; margin-bottom: 0; border-bottom: 2px solid #6a3eb7; }
