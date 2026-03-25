@@ -107,13 +107,16 @@ main {
 /* HEADER */
 /* -------------------------------------------------------- */
 
+/* edit this to have the image url out if it ends up giving you too much trouble*/
 header {
   grid-area: header;
   font-size: 1.2em;
   border: var(--border);
   border-radius: var(--round-borders);
-  background: var(--content-background-color);
+  background-color: var(--content-background-color);
   background-image: url("./images/vaporwave.jpeg");
+  background-size: cover;      /* stretches image to fill the header */
+  background-position: center; /* centers it */
 }
 
 .header-content {
