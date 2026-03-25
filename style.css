@@ -50,7 +50,7 @@ body {
   font-family: var(--font);
   line-height: 1.2;
   background: var(--background-color);
-  background-image: url("https://willdotjpg.gay/images/backgrounds/bgstarz3.gif");
+  background-image: url("./images/bgstarz3.gif");
   
 }
 
@@ -113,6 +113,7 @@ header {
   border: var(--border);
   border-radius: var(--round-borders);
   background: var(--content-background-color);
+  background-image: url("./images/vaporwave.jpeg");
 }
 
 .header-content {
