@@ -577,3 +577,15 @@ main h6 { font-size: 1em; }     /* unchanged */
     font-size: 1rem;
   }
 }
+
+/* -------------------------------------------------------- */
+/* TABLES */
+/* -------------------------------------------------------- */
+
+.lexical-table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
+.lexical-table thead tr { border-bottom: var(--border); }
+.lexical-table th { padding: 10px 12px; text-align: left; color: var(--link-color); font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.1em; }
+.lexical-table td { padding: 9px 12px; border-bottom: 1px solid rgba(106,62,183,0.3); }
+.lexical-table tr:last-child td { border-bottom: none; }
+.lexical-table tbody tr:hover td { background: rgba(106, 62, 183, 0.15); }
+.lexical-table td:not(:first-child), .lexical-table th:not(:first-child) { text-align: right; }
