@@ -33,7 +33,7 @@ function headerHTML() {
         <div class="sidebar-section">
           <div class="sidebar-title">About</div>
           <p>MS Data Analysis & Visualization candidate at Pratt Institute. I work at the intersection of data, design, and storytelling.</p>
-          <p>[Add a sentence or two about your background or interests here.]</p>
+          <p>I have a background in Sociology and Math and I love to find the narratives behind the numbers! (*^_^*)</p>
         </div>
 
         <div class="sidebar-section">
