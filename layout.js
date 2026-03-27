@@ -61,7 +61,7 @@ function headerHTML() {
 function footerHTML() {
   return `
       <footer>
-        <div>Oriel · MS Data Analysis & Visualization · Pratt Institute · <a href="https://petrapixel.neocities.org/coding/layout-generator.html">Template</a></div>
+        <div>Oriel Mwaniki-Alexander · MS Data Analysis & Visualization · Pratt Institute · <a href="https://petrapixel.neocities.org/coding/layout-generator.html">Template</a></div>
       </footer>`;
 }
 
