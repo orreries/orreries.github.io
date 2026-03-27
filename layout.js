@@ -48,9 +48,9 @@ function headerHTML() {
         <div class="sidebar-section">
           <div class="sidebar-title">Contact</div>
           <ul class="contact-links">
-            <li><a href="https://github.com/YOUR-USERNAME" target="_blank">↗ GitHub</a></li>
-            <li><a href="https://linkedin.com/in/YOUR-USERNAME" target="_blank">↗ LinkedIn</a></li>
-            <li><a href="mailto:YOUR-EMAIL@example.com">↗ Email</a></li>
+            <li><a href="https://github.com/orreries" target="_blank">↗ GitHub</a></li>
+            <li><a href="https://linkedin.com/in/orreries" target="_blank">↗ LinkedIn</a></li>
+            <li><a href="mailto:omwa5410@gmail.com">↗ Email</a></li>
           </ul>
         </div>
 
