@@ -19,7 +19,7 @@ function headerHTML() {
           <div class="header-title"><a href="${nesting}index.html" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
           <nav>
             <ul>
-              <li><a href="${nesting}index.html">Home</a></li>
+              <li><a href="${nesting}home.html">Home</a></li>
               <li><a href="${nesting}projects/aave-nlp.html">AAVE NLP</a></li>
               <li><a href="${nesting}projects/qoz-geospatial.html">QOZ Analysis</a></li>
               <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
