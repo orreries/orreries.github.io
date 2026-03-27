@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Page has finished loading. Now, do things.
   loadLayoutByPetraPixel();
-
-  // Add any custom JavaScript code here...
 });
 
 function loadLayoutByPetraPixel() {
@@ -16,118 +13,55 @@ function loadLayoutByPetraPixel() {
 const nesting = getNesting();
 
 function headerHTML() {
-  // ${nesting} outputs "./" or "../" depending on current page depth.
-  // You can use it to refer to images etc.
-  // Example: <img src="${nesting}img/logo.png"> might output <img src="../img/logo.png">
-
   return `
-  
-      <!-- =============================================== -->
-      <!-- HEADER -->
-      <!-- =============================================== -->
-
       <header>
-
         <div class="header-content">
-	        <div class="header-title">Website Title</div>
-	        
-	        <!-- NAVIGATION -->
-	        <nav>
-	          <ul>
-	            <li><a href="/">Home</a></li>
-	            <li><a href="/page1">Page 1</a></li>
-	            <li><a href="/page2">Page 2</a></li>
-	            <li><a href="/page3">Page 3</a></li>
-	            <li>
-	                <strong>Submenu (hover to show)</strong>
-	                <ul>
-	                  <li><a href="/page-a">Page A</a></li>
-	                  <li><a href="/page-b">Page B</a></li>
-	                  <li><a href="/page-c">Page C</a></li>
-	                  <li><a href="/page-d">Page D</a></li>
-	                  <li><a href="/page-e">Page E</a></li>
-	                </ul>
-	            </li>
-	          </ul>
-	        </nav>
-        	
+          <div class="header-title"><a href="${nesting}index.html" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
+          <nav>
+            <ul>
+              <li><a href="${nesting}index.html">Home</a></li>
+              <li><a href="${nesting}projects/aave-nlp.html">AAVE NLP</a></li>
+              <li><a href="${nesting}projects/qoz-geospatial.html">QOZ Analysis</a></li>
+              <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
+            </ul>
+          </nav>
         </div>
       </header>
 
-	  
-        
-      <!-- =============================================== -->
-      <!-- LEFT SIDEBAR -->
-      <!-- =============================================== -->
-
       <aside class="left-sidebar">
-	  
-        
+
         <div class="sidebar-section">
-          <div class="sidebar-title">Section Title</div>
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-          <p>Necessit atibus perferendis inventore tempore vel optio similique blanditiis quasi quam?</p>
+          <div class="sidebar-title">About</div>
+          <p>MS Data Analysis & Visualization candidate at Pratt Institute. I work at the intersection of data, design, and storytelling.</p>
+          <p>[Add a sentence or two about your background or interests here.]</p>
         </div>
-        
+
         <div class="sidebar-section">
-          <div class="sidebar-title">Section Title</div>
-          <blockquote>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-            <p>Necessit atibus perferendis inventore tempore vel optio similique blanditiis quasi quam?</p>
-          </blockquote>
-        </div>
-        
-        <div class="sidebar-section">
-          <div class="sidebar-title">Section Title</div>
+          <div class="sidebar-title">Projects</div>
           <ul>
-            <li>List</li>
-            <li>List</li>
-            <li><a href="/">List</a></li>
-            <li>List</li>
+            <li><a href="${nesting}projects/aave-nlp.html">AAVE NLP Analysis</a></li>
+            <li><a href="${nesting}projects/qoz-geospatial.html">QOZ Efficacy</a></li>
+            <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
           </ul>
         </div>
-        
+
         <div class="sidebar-section">
-          <div class="sidebar-title">Section Title</div>
-          <marquee>
-          	<a href="https://petrapixel.neocities.org/" target="_blank"><img src="https://cdn.jsdelivr.net/gh/petracoding/petrapixel.neocities.org@latest/public/img/linkback.gif" alt="petrapixel"></a>
-          	<a href="https://petrapixel.neocities.org/" target="_blank"><img src="https://cdn.jsdelivr.net/gh/petracoding/petrapixel.neocities.org@latest/public/img/linkback.gif" alt="petrapixel"></a>
-          	<a href="https://petrapixel.neocities.org/" target="_blank"><img src="https://cdn.jsdelivr.net/gh/petracoding/petrapixel.neocities.org@latest/public/img/linkback.gif" alt="petrapixel"></a>
-          	<a href="https://petrapixel.neocities.org/" target="_blank"><img src="https://cdn.jsdelivr.net/gh/petracoding/petrapixel.neocities.org@latest/public/img/linkback.gif" alt="petrapixel"></a>
-          </marquee>
+          <div class="sidebar-title">Contact</div>
+          <ul class="contact-links">
+            <li><a href="https://github.com/YOUR-USERNAME" target="_blank">↗ GitHub</a></li>
+            <li><a href="https://linkedin.com/in/YOUR-USERNAME" target="_blank">↗ LinkedIn</a></li>
+            <li><a href="mailto:YOUR-EMAIL@example.com">↗ Email</a></li>
+          </ul>
         </div>
-        
-        <div class="sidebar-section">
-          <div class="sidebar-title">Section Title</div>
-          <img class="full-width-image" src="https://picsum.photos/id/37/1000/400">
-        </div>
-        
-        <div class="sidebar-section">
-          <div class="sidebar-title">Section Title</div>
-          <div class="site-button">
-          	<a href="https://petrapixel.neocities.org/" target="_blank"><img src="https://cdn.jsdelivr.net/gh/petracoding/petrapixel.neocities.org@latest/public/img/linkback.gif" alt="petrapixel"></a>
-        	<textarea><a href="https://petrapixel.neocities.org/" target="_blank"><img src="https://cdn.jsdelivr.net/gh/petracoding/petrapixel.neocities.org@latest/public/img/linkback.gif" alt="petrapixel"></a></textarea>
-          </div>
-        </div>
+
       </aside>
-	
-      `;
+  `;
 }
 
 function footerHTML() {
-  // ${nesting} outputs "./" or "../" depending on current page depth.
-  // You can use it to refer to images etc.
-  // Example: <img src="${nesting}img/logo.png"> might output <img src="../img/logo.png">
-
   return `
-
-
-      <!-- =============================================== -->
-      <!-- FOOTER -->
-      <!-- =============================================== -->
-
       <footer>
-            <div>Footer Text. <a href="/">Link.</a> Template generated with <a href="https://petrapixel.neocities.org/coding/layout-generator.html">petrapixel's layout generator</a>.</div>
+        <div>Oriel · MS Data Analysis & Visualization · Pratt Institute · <a href="https://petrapixel.neocities.org/coding/layout-generator.html">Template</a></div>
       </footer>`;
 }
 
@@ -140,18 +74,14 @@ function giveActiveClassToCurrentPage() {
     const pathname = window.location.pathname.replace("/public/", "");
     const currentHref = window.location.href.replace(".html", "") + "END";
 
-	/* Homepage */
-    if (href == "/" || href == "/index.html") {
-      if (pathname == "/") {
+    if (href == "/" || href == `${nesting}index.html` || href.endsWith("/index")) {
+      if (pathname == "/" || pathname.endsWith("/index")) {
         el.classList.add("active");
       }
     } else {
-      /* Other pages */
       if (currentHref.includes(href + "END")) {
         el.classList.add("active");
 
-        /* Subnavigation: */
-		
         if (el.closest("details")) {
           el.closest("details").setAttribute("open", "open");
           el.closest("details").classList.add("active");
@@ -159,7 +89,7 @@ function giveActiveClassToCurrentPage() {
 
         if (el.closest("ul")) {
           if (el.closest("ul").closest("ul")) {
-          	el.closest("ul").closest("ul").classList.add("active");
+            el.closest("ul").closest("ul").classList.add("active");
           }
         }
       }
