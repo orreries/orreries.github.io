@@ -1,72 +1,467 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <link href="https://fonts.googleapis.com/css2?family=Handjet&display=swap" rel="stylesheet">
-    <title>Oriel's Portfolio</title>
-    <meta content="MS Data Analysis and Visualization portfolio — Pratt Institute" name="description" />
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="favicon.ico" rel="icon" type="image/x-icon" />
-    <link href="./style.css" rel="stylesheet" />
-    <script src="./layout.js"></script>
-    <script>
-      console.log("%cTemplate generated with petrapixel's layout generator: https://petrapixel.neocities.org/coding/layout-generator", "font-size: 14pt; color: #922a45; background: #ffd3ef");
-    </script>
-  </head>
-  <body>
-    <a href="#content" id="skip-to-content-link">Skip to content</a>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./images/favicon.ico" rel="icon" type="image/x-icon" />
+  <title>Oriel XP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    <div class="layout">
+    :root {
+      --blue-dark:   #0d1f78;
+      --blue-mid:    #3a6ec8;
+      --blue-body:   #5578c8;
+      --blue-light:  #7a9de0;
+      --blue-dot:    #4a6ac0;
+      --amber:       #f0a000;
+      --white:       #ffffff;
+      --offwhite:    #d0dcf8;
+      --orange:      #f07820;
+    }
 
-      <main id="content">
-        <noscript>Please enable JavaScript to view this website!</noscript>
+    html, body {
+      width: 100%; height: 100vh;
+      overflow: hidden;
+      background: var(--blue-body);
+      font-family: 'Handjet', 'Trebuchet MS', Tahoma, sans-serif;
+      font-weight: 400;
+      cursor: default;
+      user-select: none;
+    }
 
-        <!-- =============================================== -->
-        <!-- HOME / ABOUT -->
-        <!-- =============================================== -->
+    /* ── CRT TEXTURE ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 900;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          transparent 0px, transparent 3px,
+          rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
+        );
+    }
 
-        <section>
-          <h1>Hi, I'm Oriel.</h1>
-          <p>
-            I'm a data professional currently pursuing my MS in Data Analysis and Visualization at <strong>Pratt Institute</strong>. 
-            My work integrates both empirical analyses and storytelling to elucidate dynamics and trends in data.
-          </p>
-          <p>
-            I work with a broad selection of information, and I am familiar with data across multiple industries. Take a look at some of my recent projects below.
-          </p>
+    /* ── DOT MATRIX ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 899;
+      pointer-events: none;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+      background-size: 4px 4px;
+    }
 
-          <hr />
+    /* ════════════════════════════════
+       SCREENS
+    ════════════════════════════════ */
+    .screen {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      transition: opacity 0.55s ease;
+    }
+    .screen.hidden  { opacity: 0; pointer-events: none; }
+    .screen.gone    { display: none; }
 
-          <h2>Projects</h2>
+    /* ── CHROME BARS ── */
+    .bar-top {
+      height: 5.5vh; min-height: 36px;
+      background: var(--blue-dark);
+      flex-shrink: 0;
+    }
+    .bar-bottom {
+      height: 9vh; min-height: 56px;
+      background: var(--blue-dark);
+      border-top: 2px solid var(--amber);
+      flex-shrink: 0;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      position: relative; z-index: 10;
+    }
 
-          <div class="project-grid">
+    /* ── MAIN AREA ── */
+    .main {
+      flex: 1;
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+    }
 
-            <div class="project-card">
-              <div class="project-card-tag">NLP</div>
-              <h3>AAVE Analysis Using NLP</h3>
-              <p>Linguistic analysis of African American Vernacular English using natural language processing techniques to surface patterns in syntax and vocabulary.</p>
-              <a href="./projects/aave-nlp.html"><span class="project-card-link">View project →</span></a>
-            </div>
+    /* subtle inner glow */
+    .main::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 28% 50%, rgba(255,255,255,0.08) 0%, transparent 55%);
+      pointer-events: none;
+    }
 
-          <div class="project-card">
-              <div class="project-card-tag">Geospatial</div>
-              <h3>Qualified Opportunity Zone Efficacy</h3>
-              <p>Geospatial analysis examining whether federally designated Qualified Opportunity Zones have delivered on their economic development promises.</p>
-              <a href="./projects/qoz-geospatial.html"><span class="project-card-link">View project →</span></a>
-            </div>
+    /* vertical rule */
+    .rule {
+      position: absolute;
+      left: 50%; top: 8%; bottom: 8%;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.22) 30%, rgba(255,255,255,0.22) 70%, transparent);
+      transform: translateX(-50%);
+    }
 
-          <div class="project-card">
-              <div class="project-card-tag">Data Analysis</div>
-              <h3>Public Institutional Revenue</h3>
-              <p>Analysis of public institutional revenue data, exploring funding trends and disparities across higher education institutions.</p>
-              <a href="./projects/institutional-revenue.html"><span class="project-card-link">View project →</span></a>
+    /* ════════════════════════════════
+       LEFT — BRANDING
+    ════════════════════════════════ */
+    .panel-brand {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 20px;
+      position: relative; z-index: 5;
+    }
+
+    .logo-row {
+      display: flex; align-items: center; gap: 14px;
+    }
+
+    /* XP Windows flag */
+    .flag { width: 72px; height: 72px; }
+
+    .brand-text { display: flex; flex-direction: column; }
+
+    .brand-title {
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.5px;
+      line-height: 1;
+      text-shadow: 1px 2px 6px rgba(0,0,50,0.35);
+    }
+
+    .brand-xp {
+      color: var(--orange);
+      font-style: italic;
+      font-size: 0.55em;
+      vertical-align: super;
+      margin-left: 3px;
+    }
+
+    .brand-sub {
+      font-size: clamp(12px, 1.4vw, 16px);
+      color: var(--offwhite);
+      font-style: italic;
+      margin-top: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .login-prompt {
+      font-size: clamp(13px, 1.5vw, 17px);
+      color: var(--white);
+      text-shadow: 1px 1px 3px rgba(0,0,40,0.4);
+    }
+
+    /* ════════════════════════════════
+       RIGHT — USER CARD
+    ════════════════════════════════ */
+    .panel-user {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative; z-index: 5;
+    }
+
+    .user-card {
+      display: flex; align-items: center; gap: 18px;
+      padding: 14px 26px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s, transform 0.1s;
+    }
+    .user-card:hover {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.28);
+    }
+    .user-card:active { transform: scale(0.97); }
+
+    /* Initials avatar */
+    .avatar {
+      width: 68px; height: 68px;
+      border-radius: 4px;
+      border: 3px solid rgba(255,255,255,0.55);
+      background: linear-gradient(135deg, #2a4ea8 0%, #1a3080 100%);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* small grid pattern inside avatar */
+    .avatar::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 8px 8px;
+    }
+
+    .avatar-initials {
+      font-family: 'Handjet', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 2px;
+      position: relative; z-index: 1;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+
+    .user-info { text-align: left; }
+
+    .user-name {
+      font-size: clamp(18px, 2.2vw, 24px);
+      font-weight: 700;
+      color: var(--white);
+      text-shadow: 1px 1px 3px rgba(0,0,40,0.4);
+    }
+
+    .user-role {
+      font-size: clamp(11px, 1.2vw, 14px);
+      color: var(--orange);
+      font-style: italic;
+      margin-top: 2px;
+    }
+
+    /* ════════════════════════════════
+       BOTTOM BAR
+    ════════════════════════════════ */
+    .restart-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 10px; border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .restart-btn:hover { background: rgba(255,255,255,0.1); }
+
+    .restart-icon { width: 26px; height: 26px; }
+
+    .restart-label {
+      color: var(--white);
+      font-family: 'Handjet', monospace;
+      font-size: clamp(12px, 1.3vw, 15px);
+      letter-spacing: 0.5px;
+    }
+
+    .bottom-tagline {
+      color: var(--offwhite);
+      font-family: 'Handjet', monospace;
+      font-size: clamp(10px, 1.1vw, 13px);
+      text-align: right;
+      line-height: 1.7;
+    }
+
+    /* amber separator above bottom bar */
+    #login-screen .bar-bottom {
+      /* already set via bar-bottom */
+    }
+
+    /* ════════════════════════════════
+       WELCOME SCREEN
+    ════════════════════════════════ */
+    #welcome-screen {
+      background: var(--blue-body);
+      justify-content: space-between;
+    }
+    #welcome-screen .bar-top  { background: var(--blue-dark); }
+    #welcome-screen .bar-bottom-welcome {
+      height: 9vh; min-height: 56px;
+      background: var(--blue-dark);
+      border-top: 2px solid var(--amber);
+      flex-shrink: 0;
+    }
+
+    .welcome-stage {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 28px;
+    }
+
+    .welcome-word {
+      font-family: 'Handjet', monospace;
+      font-size: clamp(36px, 6vw, 64px);
+      font-style: italic;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 10px rgba(0,0,60,0.25);
+      opacity: 0;
+      animation: wFadeIn 0.7s ease 0.25s forwards;
+    }
+
+    @keyframes wFadeIn {
+      from { opacity: 0; transform: scale(0.94); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .dots {
+      display: flex; gap: 10px;
+      opacity: 0;
+      animation: wFadeIn 0.5s ease 0.7s forwards;
+    }
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--white);
+      animation: pulse 1.3s ease infinite;
+    }
+    .dot:nth-child(1) { animation-delay: 0s; }
+    .dot:nth-child(2) { animation-delay: 0.22s; }
+    .dot:nth-child(3) { animation-delay: 0.44s; }
+
+    @keyframes pulse {
+      0%, 80%, 100% { opacity: 0.2; transform: scale(0.75); }
+      40%           { opacity: 1;   transform: scale(1); }
+    }
+
+    /* ── page-load fade in ── */
+    #login-screen { animation: bootFade 1s ease forwards; }
+    @keyframes bootFade {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="login-screen">
+  <div class="bar-top"></div>
+
+  <div class="main">
+    <div class="rule"></div>
+
+    <!-- LEFT: branding -->
+    <div class="panel-brand">
+      <div class="logo-row">
+        <!-- Windows XP flag, hand-drawn in SVG -->
+        <svg class="flag" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="shine" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="white" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="white" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <!-- red -->
+          <path d="M4 10 L34 6 L34 34 L4 34 Z" fill="#e8271f"/>
+          <!-- green -->
+          <path d="M38 5 L68 1 L68 32 L38 32 Z" fill="#4abf17"/>
+          <!-- blue -->
+          <path d="M4 38 L34 38 L34 64 L4 60 Z" fill="#0044c8"/>
+          <!-- yellow -->
+          <path d="M38 36 L68 36 L68 64 L38 67 Z" fill="#f5c400"/>
+          <!-- gloss -->
+          <rect x="4" y="1" width="64" height="66" fill="url(#shine)" rx="2"/>
+        </svg>
+
+        <div class="brand-text">
+          <div class="brand-title">
+            Oriel<span class="brand-xp">xp</span>
           </div>
+          <div class="brand-sub">MS Data Analysis &amp; Visualization</div>
+        </div>
+      </div>
 
-          </div>
-        </section>
-
-      </main>
-
+      <div class="login-prompt">To begin, click Oriel to log on</div>
     </div>
-  </body>
+
+    <!-- RIGHT: user -->
+    <div class="panel-user">
+      <div class="user-card" id="login-btn" onclick="doLogin()" role="button" tabindex="0">
+        <div class="avatar">
+          <span class="avatar-initials">O</span>
+        </div>
+        <div class="user-info">
+          <div class="user-name">Oriel</div>
+          <div class="user-role">MS DAV Student @ Pratt</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar-bottom">
+    <div class="restart-btn" onclick="doLogin()">
+      <!-- green arrow icon -->
+      <svg class="restart-icon" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg">
+        <rect width="26" height="26" rx="4" fill="#2a8a2a"/>
+        <path d="M13 5 A8 8 0 0 1 21 13" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <path d="M21 13 A8 8 0 1 1 8.5 6.5" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <polygon points="21,9 25,13 21,17" fill="white"/>
+      </svg>
+      <span class="restart-label">Restart Portfolio XP</span>
+    </div>
+    <div class="bottom-tagline">
+      After you log on, the portfolio's yours to explore.<br>
+      Every project has been built with a purpose.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     WELCOME SCREEN
+══════════════════════════════════════ -->
+<div class="screen hidden gone" id="welcome-screen">
+  <div class="bar-top"></div>
+  <div class="welcome-stage">
+    <div class="welcome-word">welcome</div>
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+  <div class="bar-bottom-welcome"></div>
+</div>
+
+<script>
+  let busy = false;
+
+  function doLogin() {
+    if (busy) return;
+    busy = true;
+
+    const login   = document.getElementById('login-screen');
+    const welcome = document.getElementById('welcome-screen');
+
+    // 1. fade out login
+    login.classList.add('hidden');
+
+    setTimeout(() => {
+      login.classList.add('gone');
+
+      // 2. show welcome
+      welcome.classList.remove('gone');
+      requestAnimationFrame(() => welcome.classList.remove('hidden'));
+
+      // 3. after welcome plays, redirect
+      setTimeout(() => {
+        welcome.classList.add('hidden');
+        setTimeout(() => {
+          window.location.href = './home.html';
+        }, 600);
+      }, 2800);
+
+    }, 560);
+  }
+
+  // keyboard support
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') doLogin();
+  });
+
+  document.getElementById('login-btn').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') doLogin();
+  });
+</script>
+
+</body>
 </html>
