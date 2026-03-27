@@ -7,9 +7,9 @@
 /* Variables are used like this: var(--text-color) */
 :root {
   /* Background Colors: */
-  --background-color: #1764ff;
-  --content-background-color: #26254fe2;
-  --sidebar-background-color: #16152eba;
+  --background-color: #000000;
+  --content-background-color: #000000;
+  --sidebar-background-color: #000000;
 
   /* Text Colors: */
   --text-color: #f1f1f1;
