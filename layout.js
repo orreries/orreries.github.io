@@ -16,7 +16,7 @@ function headerHTML() {
   return `
       <header>
         <div class="header-content">
-          <div class="header-title"><a href="${nesting}index.html" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
+          <div class="header-title"><a href="${nesting}home.html" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
           <nav>
             <ul>
               <li><a href="${nesting}home.html">Home</a></li>
