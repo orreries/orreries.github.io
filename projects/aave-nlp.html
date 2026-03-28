@@ -30,15 +30,15 @@
             This project explores how well machine learning models capture African American Vernacular English (AAVE), using comedy movie scripts as a test case. The core problem is that most NLP systems are trained on standardized English, which means dialects like AAVE are often poorly understood and represented.
           </p>
           <p>
-            Non-Black individuals emulating the speech of Black people is pervasive. This serves as an inquiry into the content of popular comedic media. My role was to design and execute a complete workflow — from data collection through analysis to interpretation. Key stakeholders include researchers, technologists, and anyone building or evaluating NLP systems, especially those interested in bias, representation, and language equity. Success meant quantitatively and qualitatively showing gaps in how AAVE is represented in model-relevant text spaces.
+            Non-Black individuals emulating the speech of Black people is pervasive. This serves as an inquiry into the content of popular comedic media. My role was to design and execute a complete workflow that spanned from data collection through analysis to interpretation. Key stakeholders include researchers, technologists, and anyone building or evaluating NLP systems, especially those interested in bias, representation, and language equity. Success meant quantitatively and qualitatively showing gaps in how AAVE is represented in model-relevant text spaces.
           </p>
           <p>
-            What makes this problem unique is that AAVE is highly contextual and culturally embedded, inconsistently documented in structured datasets, and often misclassified or erased in NLP pipelines. External constraints included limited AAVE corpora, reliance on scraped scripts and social media data, and a semester timeline.
+            What makes this problem unique is that AAVE is highly contextual and culturally embedded. It is inconsistently documented in structured datasets, and often misclassified or erased in NLP pipelines. External constraints included limited AAVE corpora, reliance on scraped scripts and social media data, and a semester timeline.
           </p>
 
           <h2>Approach</h2>
           <p>
-            I approached this as a comparative NLP pipeline examining how AAVE appears across two domains: movie scripts (structured, written dialogue) and social media text (tweets). Going in, I knew that embeddings and cosine similarity are commonly used to measure semantic alignment — but I also suspected they would fail to capture syntactic nuance. I conducted research on how AAVE is treated in NLP literature, built an AAVE lexicon to detect surface-level usage, and considered domain adaptation as a possible method of improvement.
+            I approached this as a comparative NLP pipeline examining how AAVE appears across two domains: movie scripts (structured, written dialogue) and social media text (tweets). As I started my analysis, I knew that embeddings and cosine similarity are commonly used to measure semantic alignment, but I also suspected they would fail to capture syntactic nuance. I conducted research on how AAVE is treated in NLP literature, built an AAVE lexicon to detect surface-level usage, and considered domain adaptation as a possible method of improvement.
           </p>
           <p>
             This led to two key analytical angles: lexical analysis (are AAVE terms present at all?) and semantic similarity (do models treat AAVE-aligned text as meaningfully similar?).
@@ -81,7 +81,7 @@
           </code></pre>
 
           <p>
-            After establishing that lexical baseline, I shifted to semantic analysis. Embeddings were generated for both datasets using a pretrained model — each script as a single embedding, tweets individually then averaged for a stable comparison point.
+            After establishing that lexical baseline, I shifted to semantic analysis. Embeddings were generated for both datasets using a pretrained model that converted each script as a single embedding, tweets individually then averaged for a stable comparison point.
           </p>
 
           <pre><code class="language-python">
@@ -103,12 +103,12 @@
             This produced two layers of insight: a single similarity score (script vs. corpus average) and a distribution of similarities (script vs. each individual tweet). The second layer revealed variability in whether a script aligns strongly with some tweets but not others.
           </p>
           <p>
-            A number of technical challenges required iteration: handling mismatched data structures, reshaping embeddings for cosine similarity compatibility, and scaling the pipeline across multiple scripts. Small details like <code class="language-python">avg_tweet_embedding = np.mean(tweet_embeddings, axis=0).reshape(1, -1)</code> ended up being critical for valid results. The lexical density analysis also proved more limited than expected — many AAVE expressions are highly contextual in ways that standard token-based matching doesn't capture well.
+            A number of technical challenges required iteration: handling mismatched data structures, reshaping embeddings for cosine similarity compatibility, and scaling the pipeline across multiple scripts. Small details like <code class="language-python">avg_tweet_embedding = np.mean(tweet_embeddings, axis=0).reshape(1, -1)</code> ended up being critical for valid results. The lexical density analysis also proved more limited than expected. Many AAVE expressions are highly contextual in ways that standard token-based matching doesn't capture well.
           </p>
 
           <h2>Results</h2>
           <p>
-            The pipeline produced consistent, reproducible metrics across all ten scripts. AAVE presence is uneven and often surface-level in films outside of culturally specific contexts. Even when AAVE terms appear, semantic similarity scores remain relatively low — suggesting models are not capturing deeper linguistic structure.
+            The pipeline produced consistent, reproducible metrics across all ten scripts. AAVE presence is uneven and often superficial in films outside of culturally specific contexts. Even when AAVE terms appear, semantic similarity scores remain relatively low which suggests models are not capturing deeper linguistic structure.
           </p>
 
           <style>
@@ -317,7 +317,14 @@
           </script>
 
           <p>
-            The tables below show AAVE density by film, the most frequent terms per script, and cosine similarity scores against the tweet corpus. Key takeaways: AAVE is underrepresented in model training data, topic consistently overrides dialect in embedding space, and dialectal distinctions collapse into a single semantic space regardless of cultural specificity. The framework is extensible — next steps could include audio transcription (e.g., via Whisper), expanding to other minoritized Englishes, or experimenting with domain-adapted models.
+            The tables below show AAVE density by film, the most frequent terms per script, and cosine similarity scores against the tweet corpus. 
+          </p>
+
+          <h2>
+            Key Points
+          </h2>
+          <p>
+          AAVE is underrepresented in model training data, topic consistently overrides dialect in embedding space, and dialectal distinctions collapse into a single semantic space regardless of cultural specificity. Next steps could include audio transcription (e.g., via Whisper), expanding to other minoritized Englishes, or experimenting with domain adaptation.
           </p>
 
           <h2>What I Learned</h2>
@@ -328,11 +335,15 @@
           </ul>
 
           <h2>Tools &amp; Technologies</h2>
+          <p> This project was scripted with Python and I used a Google Colab to run the code. A few libraries used in the analyses include:</p>
+
           <ul>
-            <li>Python · spaCy · NLTK</li>
-            <li>Pandas · Jupyter Notebook</li>
-            <li>Matplotlib · Seaborn</li>
-            <li>sentence-transformers (MiniLM) · scikit-learn</li>
+            <li>NLTK</li>
+            <li>Pandas</li>
+            <li>Matplotlib</li>
+            <li>Seaborn</li>
+            <li>sentence-transformers (MiniLM)</li>
+		        <li>scikit-learn</li>
           </ul>
 
           <hr />
