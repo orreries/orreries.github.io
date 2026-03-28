@@ -590,12 +590,11 @@ main h6 { font-size: 1em; }     /* unchanged */
 .lexical-table tbody tr:hover td { background: rgba(106, 62, 183, 0.15); }
 .lexical-table td:not(:first-child), .lexical-table th:not(:first-child) { text-align: right; }
 
-/* ── Prism syntax highlighting: site palette ── */
 pre[class*="language-"], code[class*="language-"] {
   font-family: Monaco, 'Courier New', monospace;
   font-size: 12px;
   line-height: 1.7;
-  background: rgba(18, 16, 38, 0.85);
+  background: rgba(18, 16, 38, 0.85) !important;
   color: #c9c0e8;
   border: 1px solid #6a3eb7;
   border-radius: 4px;
