@@ -31,9 +31,9 @@ function headerHTML() {
       <aside class="left-sidebar">
 
         <div class="sidebar-section">
-          <div class="sidebar-title">About</div>
-          <p>MS Data Analysis & Visualization candidate at Pratt Institute. I work at the intersection of data, design, and storytelling.</p>
-          <p>I have a background in Sociology and Math and I love to find the narratives behind the numbers! (*^_^*)</p>
+          <div class="sidebar-title">About Me</div>
+          <p>My name is Oriel Mwaniki-Alexander and I am a MS Data Analysis & Visualization candidate at Pratt Institute. I work at the intersection of data, design, and storytelling.</p>
+          <p>I love to find the narratives behind the numbers! (*^_^*)</p>
         </div>
 
         <div class="sidebar-section">
