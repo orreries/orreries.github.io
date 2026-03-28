@@ -590,7 +590,7 @@ main h6 { font-size: 1em; }     /* unchanged */
 .lexical-table tbody tr:hover td { background: rgba(106, 62, 183, 0.15); }
 .lexical-table td:not(:first-child), .lexical-table th:not(:first-child) { text-align: right; }
 
-pre[class*="language-"], code[class*="language-"] {
+main pre[class*="language-"], code[class*="language-"] {
   font-family: Monaco, 'Courier New', monospace;
   font-size: 12px;
   line-height: 1.7;
@@ -599,7 +599,7 @@ pre[class*="language-"], code[class*="language-"] {
   border: 1px solid #6a3eb7;
   border-radius: 4px;
 }
-pre[class*="language-"] {
+main pre[class*="language-"] {
   background-image: none !important;
   padding: 1.2em 1.4em;
   overflow-x: auto;
