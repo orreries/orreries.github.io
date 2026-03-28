@@ -28,7 +28,7 @@ function headerHTML() {
                   <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
                 </ul>
               </li>
-              <li><a href="${nesting}resume.html">Resume</a></li>
+              <li><a href="${nesting}resume.html" target="_top">Resume</a></li>
             </ul>
           </nav>
         </div>
