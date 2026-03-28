@@ -102,3 +102,18 @@ function getNesting() {
   if (numberOfSlashes == 1) return "./";
   return "../".repeat(numberOfSlashes - 1);
 }
+
+// Load Prism.js syntax highlighting
+(function () {
+  const core = document.createElement('script');
+  core.src = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js';
+  core.onload = function () {
+    // Load language components after core is ready
+    ['python', 'r', 'javascript', 'bash'].forEach(function (lang) {
+      const s = document.createElement('script');
+      s.src = `https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-${lang}.min.js`;
+      document.head.appendChild(s);
+    });
+  };
+  document.head.appendChild(core);
+})();

@@ -52,54 +52,58 @@
             I used a dictionary-centered approach to identify AAVE presence, iterating through the text with n-grams to capture both single-word and multi-word expressions. This produced lexical metrics like density and variation as a baseline measure of how often AAVE appeared in each dataset.
           </p>
 
-          <pre><code># cleaning the tweet list to remove special characters (e.g., #, @, emojis)
-                      def clean_tweet(tweet):
-                          tweet = re.sub(r'@\w+', '', tweet)        # remove mentions (@username)
-                          tweet = re.sub(r'#', '', tweet)            # remove hashtags
-                          tweet = re.sub(r'http\S+', '', tweet)      # remove URLs
-                          tweet = re.sub(r'[^\x00-\x7F]+', '', tweet)  # remove non-ASCII characters
-                          tweet = re.sub(r'[^a-zA-Z\s]', '', tweet)  # remove special characters and numbers
-                          tweet = ' '.join(tweet.split())            # remove extra whitespace
-                          return tweet.lower()                       # convert to lowercase
+          <pre><code class="language-python">
+          # cleaning the tweet list to remove special characters (e.g., #, @, emojis)
+          def clean_tweet(tweet):
+              tweet = re.sub(r'@\w+', '', tweet)        # remove mentions (@username)
+              tweet = re.sub(r'#', '', tweet)            # remove hashtags
+              tweet = re.sub(r'http\S+', '', tweet)      # remove URLs
+              tweet = re.sub(r'[^\x00-\x7F]+', '', tweet)  # remove non-ASCII characters
+              tweet = re.sub(r'[^a-zA-Z\s]', '', tweet)  # remove special characters and numbers
+              tweet = ' '.join(tweet.split())            # remove extra whitespace
+              return tweet.lower()                       # convert to lowercase
 
-                      # split my_text into a list; group AAVE terms by n-gram length
-                      d = defaultdict(list)
-                      for i in aave_terms_list:
-                          k = i.split()
-                          d[len(k)].append(tuple(k))
+          # split my_text into a list; group AAVE terms by n-gram length
+          d = defaultdict(list)
+          for i in aave_terms_list:
+              k = i.split()
+              d[len(k)].append(tuple(k))
 
-                      # for each key in d find corresponding n-grams and build a Counter
-                      def ngram_counter(my_text_split, d):
-                          match_counts = dict()
-                          for n,v in d.items():
-                              c = Counter(ngrams(my_text_split, n))
-                              for k in v:
-                                  if k in c:
-                                      match_counts[k] = c[k]
-                          return match_counts</code></pre>
+          # for each key in d find corresponding n-grams and build a Counter
+          def ngram_counter(my_text_split, d):
+              match_counts = dict()
+              for n,v in d.items():
+                  c = Counter(ngrams(my_text_split, n))
+                  for k in v:
+                      if k in c:
+                          match_counts[k] = c[k]
+              return match_counts
+          </code></pre>
 
           <p>
             After establishing that lexical baseline, I shifted to semantic analysis. Embeddings were generated for both datasets using a pretrained model — each script as a single embedding, tweets individually then averaged for a stable comparison point.
           </p>
 
-          <pre><code># create embeddings directly from the script content
-                        script_embedding = model.encode([script_content])
-                        tweet_embeddings = model.encode(tweets_list)
+          <pre><code class="language-python">
+            # create embeddings directly from the script content
+            script_embedding = model.encode([script_content])
+            tweet_embeddings = model.encode(tweets_list)
 
-                        # calculate average embedding for the tweet corpus
-                        avg_tweet_embedding = np.mean(tweet_embeddings, axis=0).reshape(1, -1)
+            # calculate average embedding for the tweet corpus
+            avg_tweet_embedding = np.mean(tweet_embeddings, axis=0).reshape(1, -1)
 
-                        # overall cosine similarity b/w the script and average tweet embeddings
-                        similarity_score = cosine_similarity(script_embedding, avg_tweet_embedding)[0][0]
+            # overall cosine similarity b/w the script and average tweet embeddings
+            similarity_score = cosine_similarity(script_embedding, avg_tweet_embedding)[0][0]
 
-                        # cosine similarity between scripts and each tweet
-                        individual_similarities = cosine_similarity(script_embedding, tweet_embeddings)[0]</code></pre>
+            # cosine similarity between scripts and each tweet
+            individual_similarities = cosine_similarity(script_embedding, tweet_embeddings)[0]
+          </code></pre>
 
           <p>
             This produced two layers of insight: a single similarity score (script vs. corpus average) and a distribution of similarities (script vs. each individual tweet). The second layer revealed variability in whether a script aligns strongly with some tweets but not others.
           </p>
           <p>
-            A number of technical challenges required iteration: handling mismatched data structures, reshaping embeddings for cosine similarity compatibility, and scaling the pipeline across multiple scripts. Small details like <code>avg_tweet_embedding = np.mean(tweet_embeddings, axis=0).reshape(1, -1)</code> ended up being critical for valid results. The lexical density analysis also proved more limited than expected — many AAVE expressions are highly contextual in ways that standard token-based matching doesn't capture well.
+            A number of technical challenges required iteration: handling mismatched data structures, reshaping embeddings for cosine similarity compatibility, and scaling the pipeline across multiple scripts. Small details like <code class="language-python">avg_tweet_embedding = np.mean(tweet_embeddings, axis=0).reshape(1, -1)</code> ended up being critical for valid results. The lexical density analysis also proved more limited than expected — many AAVE expressions are highly contextual in ways that standard token-based matching doesn't capture well.
           </p>
 
           <h2>Results</h2>
