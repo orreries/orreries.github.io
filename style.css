@@ -601,7 +601,7 @@ pre[class*="language-"], code[class*="language-"] {
   border-radius: 4px;
 }
 pre[class*="language-"] {
-  background-image: none;
+  background-image: none !important;
   padding: 1.2em 1.4em;
   overflow-x: auto;
   margin: 1.2em 0;
@@ -610,7 +610,7 @@ pre[class*="language-"] {
 .token.comment   { color: #7a6a9a; font-style: italic; }
 .token.keyword   { color: #ea7af4; }
 .token.function  { color: #b39ddb; }
-.token.string    { color: #7ecfb0; }
+.token.string    { color: #7ecfc1; }
 .token.operator,
 .token.punctuation { color: #9b84cc; }
 .token.builtin,
