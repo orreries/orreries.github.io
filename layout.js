@@ -20,9 +20,15 @@ function headerHTML() {
           <nav>
             <ul>
               <li><a href="${nesting}home.html">Home</a></li>
-              <li><a href="${nesting}projects/aave-nlp.html">AAVE NLP</a></li>
-              <li><a href="${nesting}projects/qoz-geospatial.html">QOZ Analysis</a></li>
-              <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
+              <li class="dropdown">
+                <a href="#">Projects ▾</a>
+                <ul class="dropdown-menu">
+                  <li><a href="${nesting}projects/aave-nlp.html">AAVE NLP</a></li>
+                  <li><a href="${nesting}projects/qoz-geospatial.html">QOZ Analysis</a></li>
+                  <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
+                </ul>
+              </li>
+              <li><a href="${nesting}resume.html">Resume</a></li>
             </ul>
           </nav>
         </div>
