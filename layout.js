@@ -40,7 +40,7 @@ function headerHTML() {
           <div class="sidebar-title">About Me</div>
           <div style="text-align:center; margin-bottom: 0.6em;">
             <img src="${nesting}images/penguin.gif" alt="Placeholder photo" style="width:100%; max-width:160px; display:block; margin: 0 auto; border: var(--border);" />
-            <p style="font-size:0.65em; color:#7a6a9a; font-style:italic; margin-top:4px; line-height:1.4;">professional photo pending.<br>tux is filling in for now.</p>
+            <p style="font-size:0.65em; color:#7a6a9a; font-style:italic; margin-top:4px; line-height:1.4;">professional photo pending. tux is filling in for now.</p>
           </div>
           <p>My name is Oriel Mwaniki-Alexander and I am a MS Data Analysis & Visualization candidate at Pratt Institute. I work at the intersection of data, design, and storytelling.</p>
           <p>I love to find the narratives behind the numbers! (*^_^*)</p>
