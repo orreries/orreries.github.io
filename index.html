@@ -567,6 +567,99 @@
       font-size: 12px;
       color: var(--xp-dim);
     }
+
+    /* ══════════════════════════════════
+       XP PENGUIN TOOLTIPS
+    ══════════════════════════════════ */
+    .xp-tip {
+      position: fixed;
+      bottom: 52px;
+      right: 18px;
+      width: 280px;
+      background: var(--xp-bar);
+      border: 2px solid var(--site-purple);
+      border-radius: 3px;
+      box-shadow: 0 0 24px rgba(106,62,183,0.5), 0 4px 16px rgba(0,0,0,0.5);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      pointer-events: none;
+    }
+    .xp-tip.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+    .xp-tip-titlebar {
+      height: 24px;
+      background: linear-gradient(to right, var(--site-purple), #1a0a3a);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 7px;
+      flex-shrink: 0;
+    }
+    .xp-tip-title {
+      font-family: 'Handjet', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 0.4px;
+    }
+    .xp-tip-close {
+      width: 16px; height: 14px;
+      background: rgba(180,30,30,0.7);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 1px;
+      font-size: 9px;
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-family: monospace;
+    }
+    .xp-tip-close:hover { background: rgba(220,40,40,0.9); }
+    .xp-tip-body {
+      display: flex; align-items: flex-end;
+      gap: 10px;
+      padding: 10px 12px 12px;
+    }
+    .xp-tip-penguin {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+    .xp-tip-text {
+      font-family: 'Handjet', monospace;
+      font-size: 14px;
+      color: var(--xp-white);
+      line-height: 1.5;
+    }
+    .xp-tip-text strong {
+      color: var(--site-pink);
+    }
+    /* speech bubble tail pointing down-left toward penguin */
+    .xp-tip-bubble {
+      background: rgba(106,62,183,0.15);
+      border: 1px solid rgba(106,62,183,0.4);
+      border-radius: 3px;
+      padding: 7px 9px;
+      position: relative;
+      flex: 1;
+    }
+    .xp-tip-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 16px;
+      width: 0; height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 7px solid rgba(106,62,183,0.4);
+    }
   </style>
 </head>
 <body>
@@ -745,6 +838,35 @@
 
 </div>
 
+<!-- ══════════════════════════════════
+     XP PENGUIN TOOLTIPS
+══════════════════════════════════ -->
+<div class="xp-tip" id="tip-start">
+  <div class="xp-tip-titlebar">
+    <span class="xp-tip-title">💡 Tip of the Day</span>
+    <div class="xp-tip-close" onclick="dismissTip('tip-start', 'tip-header')">✕</div>
+  </div>
+  <div class="xp-tip-body">
+    <img class="xp-tip-penguin" src="./images/walking-penguin.gif" alt="Tux the penguin" />
+    <div class="xp-tip-bubble xp-tip-text">
+      Click <strong>start</strong> in the taskbar for full-screen links to all pages!
+    </div>
+  </div>
+</div>
+
+<div class="xp-tip" id="tip-header">
+  <div class="xp-tip-titlebar">
+    <span class="xp-tip-title">💡 Tip of the Day</span>
+    <div class="xp-tip-close" onclick="dismissTip('tip-header', null)">✕</div>
+  </div>
+  <div class="xp-tip-body">
+    <img class="xp-tip-penguin" src="./images/walking-penguin.gif" alt="Tux the penguin" />
+    <div class="xp-tip-bubble xp-tip-text">
+      Click <strong>Oriel's Portfolio</strong> in the header to return to the login screen!
+    </div>
+  </div>
+</div>
+
 <script>
   let busy = false;
 
@@ -770,9 +892,26 @@
           desktop.classList.remove('gone');
           requestAnimationFrame(() => desktop.classList.remove('hidden'));
           startClock();
+          // Show first tip after desktop appears
+          setTimeout(() => showTip('tip-start'), 1200);
         }, 580);
       }, 2800);
     }, 560);
+  }
+
+  /* ── Penguin Tips ── */
+  function showTip(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('visible');
+  }
+  function dismissTip(currentId, nextId) {
+    const el = document.getElementById(currentId);
+    if (el) {
+      el.classList.remove('visible');
+      if (nextId) {
+        setTimeout(() => showTip(nextId), 600);
+      }
+    }
   }
 
   /* ── Clock ── */
@@ -815,6 +954,8 @@
     const desktop = document.getElementById('desktop-screen');
     const login   = document.getElementById('login-screen');
     desktop.classList.add('hidden');
+    // Hide any tips
+    document.querySelectorAll('.xp-tip').forEach(t => t.classList.remove('visible'));
     setTimeout(() => {
       desktop.classList.add('gone');
       login.classList.remove('gone');
