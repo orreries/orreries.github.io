@@ -19,7 +19,7 @@ function headerHTML() {
           <div class="header-title"><a href="${nesting}index.html" target="_top" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
           <nav>
             <ul>
-              <li><a href="${nesting}index.html" target="_top">Home</a></li>
+              <li><a href="${nesting}home.html" target="_top">Home</a></li>
               <li class="dropdown">
                 <a href="#">Projects ▾</a>
                 <ul class="dropdown-menu">
