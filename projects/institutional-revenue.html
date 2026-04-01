@@ -21,38 +21,190 @@
         <section>
           <div class="project-tag">Data Analysis</div>
           <h1>Public Institutional Revenue Data</h1>
-          <p class="project-subtitle">Higher Education Finance · Data Analysis · Pratt Institute MS DAV</p>
+          <p class="project-subtitle">Higher Education Finance · Statistical Modeling · Information Visualization · Pratt Institute MS DAV</p>
 
           <hr />
 
           <h2>Overview</h2>
           <p>
-            [Describe the project goal here — what funding trends or disparities were you investigating? What dataset did you use?]
+            Public higher education in the United States has changed significantly over the past two decades. Flagship universities have expanded revenue through research and private funding, while many regional and minority-serving institutions remain under-resourced. Declining state support, rising tuition dependence, and uneven access to funding have created clear gaps between institutions. Using IPEDS data, this project connects student outcomes to financial outcomes and places both within a broader system of inequality in higher education.
           </p>
-
-          <h2>Methods</h2>
           <p>
-            [Describe your methodology — how did you clean, explore, and analyze the data?]
+            The research question that drives these analyses is: What is the effect of minority degree attainment on public university revenue from 2002 to 2022? This question prompted additional investigation into institutional revenue dynamics during the time period. 
+          </p>
+          <p>
+            This project also sits within a specific policy context. Recent action to repeal affirmative action and DEI initiatives has accelerated. Research by Backes (2012), Howell (2010), and Hinrichs (2012) all find that minority student populations fell following affirmative action bans. Howell estimates that underrepresented minority enrollment at the most selective universities could decrease by 10 percent. This analysis asks whether that shift in who attends public universities has measurable financial consequences for institutions.
           </p>
 
-          <h2>Key Findings</h2>
-          <ul>
-            <li>[Finding 1]</li>
-            <li>[Finding 2]</li>
-            <li>[Finding 3]</li>
-          </ul>
+          <h2>Approach</h2>
+          <p>
+            I approached this project by combining statistical modeling with contextual research on higher education funding. Prior research shows that public universities have shifted away from state funding toward tuition, private revenue, and research funding. This informed my initial assumption that increases in minority degree attainment might be associated with increased institutional revenue, but not evenly across all institutions.
+          </p>
+          <p>
+            I wanted to understand whether the relationship between minority attainment and revenue was direct or considerably augmented by institutional characteristics. I started with simple relationships to establish whether a connection existed at all. Then, I introduced additional variables to test whether those relationships held under more realistic conditions. I also incorporated a comparative analysis between HBCUs and other public institutions to understand how structural differences shape outcomes.
+          </p>
+
+          <h2>Workflow</h2>
+          <p>
+            The workflow moved from exploration to modeling to visualization. After cleaning and restructuring IPEDS data around variables related to revenue, degree attainment, enrollment, and funding, initial exploration via scatterplots and a correlation matrix showed that minority degree attainment was positively associated with revenue, and that institutional size and funding variables were strongly correlated with revenue. This led to two regression models.
+          </p>
+          <p>
+            The first model isolates the relationship between minority degree attainment and revenue:
+          </p>
+
+          <pre><code class="language-r">
+# model 1 — minority degree attainment only
+multi_revs <- lm(totrev ~ Black_Degree + hispanicdegrees, data = blkhisrev)
+summary(multi_revs)
+          </code></pre>
+
+          <p>
+            Both Black degree attainment (β = $524,295) and Hispanic degree attainment (β = $459,132) were statistically significant, but the model explained only 12.3% of variance in revenue (R² = 0.1228). 
+          </p>
+          <p>
+            The second model introduced institutional controls:
+          </p>
+
+          <pre><code class="language-r">
+# model 2 — with institutional controls
+multi_revs_full <- lm(totrev ~ blkdegree +
+                               hisdegree +
+                               fedfund +
+                               totstudent +
+                               studentaidpercent +
+                               instate,
+                      data = blkhisrev)
+summary(multi_revs_full)
+          </code></pre>
+
+          <p>
+            In this expanded model, total enrollment (β = $41,541) and in-state tuition (β = $47,039) emerged as the strongest contributors to revenue. Student aid percentage showed a significant negative relationship (β = −$5,644,893). Black degree attainment remained a significant positive predictor (β = $1,966,690), while Hispanic degree attainment became statistically insignificant (p = 0.48). The model explained 36.5% of variance (R² = 0.3654).
+          </p>
+
+          <h2>Results</h2>
+          <p>
+            The findings partially support the hypothesis. Black degree attainment is a consistent positive predictor across all models. Each additional degree attained by Black students is associated with nearly 2 million dollars in institutional revenue in the full model. Hispanic degree attainment loses significance once institutional controls are added, suggesting its effect in the simpler model may reflect underlying institutional characteristics rather than a direct relationship.
+          </p>
+          <p>
+            The considerable negative effect of student aid percentage is one of the more striking findings. It raises questions about the interaction between financial aid and institutional funding, and whether the racial demographics of students receiving aid contribute to these dynamics. The moderate explanatory power of the models overall (R² = 0.365) reflects how much revenue is shaped by factors beyond demographic attainment. State and local policies, endowments, and private donations all play significant roles.
+          </p>
+          <p>
+            The HBCU/PWI comparison reveals a stark disparity. In 2022, public HBCUs generated an average of <strong>$41,785 per student</strong> (Median = $42,262; SD = $12,461), which is a relatively symmetric distribution indicating consistent but modest funding. Public PWIs averaged <strong>$209,245 per student</strong>, but the median was only $28,695. The extreme gap between the mean and median reflects a right-skewed distribution driven by a small number of institutions with massive research budgets and endowments. HBCUs are public institutions too, yet they are structurally separated from flagship funding pipelines.
+          </p>
 
           <h2>Visualizations</h2>
-          <p>[Add your charts and graphs here.]</p>
 
-          <!-- Example: -->
-          <!-- <img class="full-width-image" src="../img/revenue-chart.png" alt="Chart of institutional revenue over time" /> -->
+          <p>
+            The first dashboard examines overall public institutional revenue trends from 2002 to 2022. It combines four views: the top 10 states by cumulative revenue, a state-level revenue explorer filtered by institution, a scatterplot of minority enrollment and average revenue per year, and a choropleth of average state university revenue across the 20-year period. California, New York, and Illinois consistently outperformed peers. This can be explained by considerable research funding and larger student populations. Low-revenue states in the South and Midwest reflect regional funding disparities consistent with historical underinvestment. The demographic scatterplot shows revenue and Black enrollment trending positively together, but the relationship is modest in isolation.
+          </p>
 
-          <h2>Tools & Technologies</h2>
+          <div class='tableauPlaceholder' id='viz1775026938090' style='position: relative; margin: 1.2em 0;'>
+            <noscript>
+              <a href='#'>
+                <img alt='Public Institution Revenues from 2002 to 2022' src='https://public.tableau.com/static/images/Pu/PublicInstitutionsOverall/PWIDashboard/1.png' style='border: none' />
+              </a>
+            </noscript>
+            <object class='tableauViz' style='display:none;'>
+              <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+              <param name='embed_code_version' value='3' />
+              <param name='site_root' value='' />
+              <param name='name' value='PublicInstitutionsOverall/PWIDashboard' />
+              <param name='tabs' value='no' />
+              <param name='toolbar' value='yes' />
+              <param name='static_image' value='https://public.tableau.com/static/images/Pu/PublicInstitutionsOverall/PWIDashboard/1.png' />
+              <param name='animate_transition' value='yes' />
+              <param name='display_static_image' value='yes' />
+              <param name='display_spinner' value='yes' />
+              <param name='display_overlay' value='yes' />
+              <param name='display_count' value='yes' />
+              <param name='language' value='en-US' />
+            </object>
+          </div>
+          <script type='text/javascript'>
+            var divElement = document.getElementById('viz1775026938090');
+            var vizElement = divElement.getElementsByTagName('object')[0];
+            if (divElement.offsetWidth > 800) {
+              vizElement.style.width = '1366px';
+              vizElement.style.height = '795px';
+            } else if (divElement.offsetWidth > 500) {
+              vizElement.style.width = '1366px';
+              vizElement.style.height = '795px';
+            } else {
+              vizElement.style.width = '100%';
+              vizElement.style.height = '1527px';
+            }
+            var scriptElement = document.createElement('script');
+            scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+            vizElement.parentNode.insertBefore(scriptElement, vizElement);
+          </script>
+
+          <p>
+            The second dashboard directly compares public institutions and HBCUs across the same 20-year window. Four panels show average revenue trends for each group as adjacent bar charts and scatterplots. For public institutions, enrollment and revenue track together in a positive direction. However, for HBCUs, the trendline is slightly negative. This suggests enrollment growth has not translated into proportional revenue gains. Federal support for HBCUs dipped after 2008, stabilized through the 2010s, and surged after 2020, driven by COVID emergency funds. The data do not support the claim that HBCUs were "fully funded" in prior years; most increases were tied to already existing legislation or emergency relief.
+          </p>
+
+          <div class='tableauPlaceholder' id='viz1775026899139' style='position: relative; margin: 1.2em 0;'>
+            <noscript>
+              <a href='#'>
+                <img alt='Public Institutions vs HBCUs' src='https://public.tableau.com/static/images/HB/HBCUvsPWI_17438987223610/PublicInstitutionsvsHBCUs/1.png' style='border: none' />
+              </a>
+            </noscript>
+            <object class='tableauViz' style='display:none;'>
+              <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+              <param name='embed_code_version' value='3' />
+              <param name='site_root' value='' />
+              <param name='name' value='HBCUvsPWI_17438987223610/PublicInstitutionsvsHBCUs' />
+              <param name='tabs' value='no' />
+              <param name='toolbar' value='yes' />
+              <param name='static_image' value='https://public.tableau.com/static/images/HB/HBCUvsPWI_17438987223610/PublicInstitutionsvsHBCUs/1.png' />
+              <param name='animate_transition' value='yes' />
+              <param name='display_static_image' value='yes' />
+              <param name='display_spinner' value='yes' />
+              <param name='display_overlay' value='yes' />
+              <param name='display_count' value='yes' />
+              <param name='language' value='en-US' />
+            </object>
+          </div>
+          <script type='text/javascript'>
+            var divElement = document.getElementById('viz1775026899139');
+            var vizElement = divElement.getElementsByTagName('object')[0];
+            if (divElement.offsetWidth > 800) {
+              vizElement.style.width = '100%';
+              vizElement.style.height = (divElement.offsetWidth * 0.75) + 'px';
+            } else if (divElement.offsetWidth > 500) {
+              vizElement.style.width = '100%';
+              vizElement.style.height = (divElement.offsetWidth * 0.75) + 'px';
+            } else {
+              vizElement.style.width = '100%';
+              vizElement.style.height = '1477px';
+            }
+            var scriptElement = document.createElement('script');
+            scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+            vizElement.parentNode.insertBefore(scriptElement, vizElement);
+          </script>
+
+          <h2>Key Points</h2>
+          <p>
+            Revenue growth in public higher education is uneven. Institutions with greater resources continue to pull ahead while others fall behind. Minority degree attainment is associated with revenue, but it does not operate independently of institutional structure. Diversity alone does not guarantee financial gains without broader investment and support. HBCUs are public institutions too, but they are caught at the intersection of racial inequity and regional austerity, structurally excluded from flagship funding pipelines. Growth across the system does not translate into equitable outcomes across institutions.
+          </p>
+          <p>
+            Some limitations are worth noting. Enrollment data was limited to annual aggregates, restricting granular tracking of demographic shifts. Revenue data lacked detail on how funds were spent across instruction, administration, and research. Using state boundaries as the unit of analysis may also mask disparities between flagships and regional campuses within states.
+          </p>
+
+          <h2>What I Learned</h2>
           <ul>
-            <li>[e.g. Python, Pandas]</li>
-            <li>[e.g. Tableau, D3.js]</li>
-            <li>[e.g. IPEDS data]</li>
+            <li>Statistical relationships depend heavily on context; adding variables can change both the strength and meaning of results</li>
+            <li>Modeling without structural factors can lead to incomplete conclusions</li>
+            <li>Visualization makes complex patterns easier to interpret and communicate to broader audiences</li>
+            <li>Combining statistical and visual methods leads to stronger analysis</li>
+            <li>Data reflects systems shaped by policy, funding, and inequality</li>
+          </ul>
+
+          <h2>Tools &amp; Technologies</h2>
+          <p>This project spanned two courses and used the following tools:</p>
+          <ul>
+            <li>R (tidyverse, dplyr, ggplot2, corrplot, olsrr, usmap, sf, dygraphs)</li>
+            <li>IPEDS (Integrated Postsecondary Education Data System) via NCES</li>
+            <li>Tableau for interactive dashboards</li>
           </ul>
 
           <hr />
