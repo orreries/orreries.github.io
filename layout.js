@@ -16,13 +16,19 @@ function headerHTML() {
   return `
       <header>
         <div class="header-content">
-          <div class="header-title"><a href="${nesting}home.html" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
+          <div class="header-title"><a href="${nesting}index.html" target="_top" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
           <nav>
             <ul>
               <li><a href="${nesting}home.html">Home</a></li>
-              <li><a href="${nesting}projects/aave-nlp.html">AAVE NLP</a></li>
-              <li><a href="${nesting}projects/qoz-geospatial.html">QOZ Analysis</a></li>
-              <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
+              <li class="dropdown">
+                <a href="#">Projects ▾</a>
+                <ul class="dropdown-menu">
+                  <li><a href="${nesting}projects/aave-nlp.html">AAVE NLP</a></li>
+                  <li><a href="${nesting}projects/qoz-geospatial.html">QOZ Analysis</a></li>
+                  <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
+                </ul>
+              </li>
+              <li><a href="${nesting}resume.html" target="_top">Resume</a></li>
             </ul>
           </nav>
         </div>
@@ -31,9 +37,13 @@ function headerHTML() {
       <aside class="left-sidebar">
 
         <div class="sidebar-section">
-          <div class="sidebar-title">About</div>
-          <p>MS Data Analysis & Visualization candidate at Pratt Institute. I work at the intersection of data, design, and storytelling.</p>
-          <p>I have a background in Sociology and Math and I love to find the narratives behind the numbers! (*^_^*)</p>
+          <div class="sidebar-title">About Me</div>
+          <div style="text-align:center; margin-bottom: 0.6em;">
+            <img src="${nesting}images/penguin.gif" alt="Placeholder photo" style="width:100%; max-width:160px; display:block; margin: 0 auto; border: var(--border);" />
+            <p style="font-size:0.65em; color:#7a6a9a; font-style:italic; margin-top:4px; line-height:1.4;">professional photo pending. tux is filling in for now.</p>
+          </div>
+          <p>My name is Oriel Mwaniki-Alexander and I am a MS Data Analysis & Visualization candidate at Pratt Institute. I work at the intersection of data, design, and storytelling.</p>
+          <p>I love to find the narratives behind the numbers! (*^_^*)</p>
         </div>
 
         <div class="sidebar-section">
@@ -102,3 +112,18 @@ function getNesting() {
   if (numberOfSlashes == 1) return "./";
   return "../".repeat(numberOfSlashes - 1);
 }
+
+// Load Prism.js syntax highlighting
+(function () {
+  const core = document.createElement('script');
+  core.src = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js';
+  core.onload = function () {
+    // Load language components after core is ready
+    ['python', 'r', 'javascript', 'bash'].forEach(function (lang) {
+      const s = document.createElement('script');
+      s.src = `https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-${lang}.min.js`;
+      document.head.appendChild(s);
+    });
+  };
+  document.head.appendChild(core);
+})();

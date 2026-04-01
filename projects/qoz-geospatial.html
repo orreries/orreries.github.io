@@ -3,7 +3,7 @@
   <head>
     <link href="https://fonts.googleapis.com/css2?family=Handjet&display=swap" rel="stylesheet">
     <title>QOZ Geospatial Analysis — Oriel's Portfolio</title>
-    <meta content="Geospatial analysis of Qualified Opportunity Zone efficacy" name="description" />
+    <meta content="Geospatial analysis of Qualified Opportunity Zone efficacy in California" name="description" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="/images/favicon.ico" rel="icon" type="image/x-icon" />
@@ -19,40 +19,194 @@
         <noscript>Please enable JavaScript to view this website!</noscript>
 
         <section>
-          <div class="project-tag">Geospatial</div>
+          <div class="project-tag">GIS</div>
           <h1>Qualified Opportunity Zone Efficacy</h1>
-          <p class="project-subtitle">Geospatial Analysis · Public Policy · Pratt Institute MS DAV</p>
+          <p class="project-subtitle">Geospatial Analysis · Spatial Statistics · Public Policy · Pratt Institute MS DAV</p>
 
           <hr />
 
           <h2>Overview</h2>
           <p>
-            [Describe the project goal here — what question were you trying to answer about QOZ effectiveness? What data did you start with?]
+            This project examines the spatial relationship between mortgage activity, Qualified Opportunity Zones (QOZs), rent changes over time, and residential development indicators in California. The goal is to understand whether QOZs are positioned in areas experiencing economic investment or market shifts. Additionally, how spatial statistics reveal the dynamics of mortgage clustering and development. The analysis incorporates mortgage counts, rent values from 2010 (inflation-adjusted) and 2023, and residential building permits, alongside designated QOZ boundaries.
           </p>
-
-          <h2>Methods</h2>
           <p>
-            [Describe your methodology — what GIS tools or spatial libraries did you use? e.g. GeoPandas, QGIS, Folium, Census data, etc.]
+            California is used as the primary lens because it elucidates the tensions shaping housing markets nationwide, including underbuilding, increasing rents, and economic stratification. The state offers a view of QOZs operating within areas with the highest construction volumes nationally, yet also experiencing persistent affordability crises. This makes it a productive frame for observing the mechanisms linking federal tax policy, local development patterns, and emerging displacement pressures. The spatial patterns observable in California are not unique to the state, and the underlying dynamics provide insights applicable to communities grappling with similar policy tools nationwide.
+          </p>
+          <p>
+            Five questions structure the analysis: Are new residential building permits occurring inside QOZs or in surrounding areas? Are mortgages spatially clustered in California? Do QOZs overlap with mortgage clusters or outlier tracts? How have rents shifted from 2010 to 2023, and how do QOZ areas fit into those patterns? Overall, does the spatial evidence suggest that QOZ policy aligns with real market activity?
+          </p>
+          <p>
+            The data sources used are the American Community Survey (ACS), IRS QOZ dataset, and TIGER shapefiles.
+          </p>
+          <p>
+            This project was completed for Advanced GIS (INFO-612) at Pratt Institute and received a full score. Key stakeholders include urban planners, community advocates, and policymakers evaluating whether federal tax incentive programs are achieving their intended development outcomes in distressed communities. The analysis is designed to give those users a spatially grounded basis for questioning where QOZ designations are placed and who actually benefits from them.
           </p>
 
-          <h2>Key Findings</h2>
+          <h2>Approach</h2>
+          <p>
+            I approached this as a multi-part spatial analysis, building from descriptive mapping toward formal cluster and outlier detection. Each analytical layer adds a dimension to the question of whether QOZs are actually placed where market activity is occurring or likely to occur. I compared California to Florida as a contrasting case, since Florida's QOZ placements show meaningfully different alignment with permit and development activity.
+          </p>
+          <p>
+            The core spatial statistics methods used were Global Moran's I to test for overall clustering, Getis–Ord Gi* for hotspot analysis, and Local Moran's I for cluster and outlier detection. These were applied to mortgage activity data at the census-tract level, with QOZ boundaries overlaid to assess spatial overlap.
+          </p>
+
+          <h2>Workflow</h2>
+          <p>
+            The workflow was built in stages across three labs, each focusing on a different spatial question: building permits and QOZ intersection, mortgage clustering via spatial statistics, and rent change mapping via an ArcGIS Online web map.
+          </p>
+
+          <p>
+            The first step was to bring QOZ polygons and residential permit data into a geodatabase, run an intersection to identify permit activity within QOZ boundaries, and apply a 5-mile buffer to assess what development exists in the immediate vicinity of each zone.
+          </p>
+
+          <pre><code class="language-python">
+import arcpy, os
+
+mypath = r"C:\Users\..."
+gdb    = "QOZ_ResPerm.gdb"
+arcpy.env.workspace    = os.path.join(mypath, gdb)
+arcpy.env.overwriteOutput = True
+
+# intersect building permits with QOZ boundaries
+arcpy.analysis.Intersect(
+    in_features=["Residential_Construction_Permits_by_County", "QOZ"],
+    out_feature_class="permit_qoz_intersect",
+    join_attributes="ALL"
+)
+
+# 5-mile buffer around each QOZ to assess development proximity
+arcpy.analysis.Buffer(
+    in_features="QOZ",
+    out_feature_class="QOZ_Buffer",
+    buffer_distance_or_field="5 Miles",
+    dissolve_option="NONE"
+)
+          </code></pre>
+
+          <p>
+            The dissolve tool was then used to merge QOZ buffers by state into single "likely development area" polygons, making it easier to assess where overlapping incentive zones create larger corridors of potential investment.
+          </p>
+
+          <pre><code class="language-python">
+# dissolve QOZ buffers into state-level development area polygons
+arcpy.gapro.DissolveBoundaries(
+    input_layer="California QOZ",
+    out_feature_class="California_Dev_Area",
+    multipart="SINGLE_PART",
+    dissolve_fields="DISSOLVE_FIELDS",
+    fields="BUFF_DIST"
+)
+          </code></pre>
+
+          <p>
+            For the mortgage analysis, Global Moran's I was run first to confirm spatial autocorrelation before applying local statistics. The R script below handled the data join that fed the rent change web map, merging ACS rent estimates across years at the tract level.
+          </p>
+
+          <pre><code class="language-r">
+# join 2010 (inflation-adjusted) and 2023 ACS rent data at tract level
+# for use in the ArcGIS Online rent change web map
+library(dplyr)
+
+rent_joined <- rent_2010 %>%
+  left_join(rent_2023, by = "GEOID") %>%
+  mutate(rent_change = med_rent_2023 - med_rent_2010_adj)
+          </code></pre>
+
+          <h2>Results</h2>
+
+          <h3>Building Permits: California vs. Florida</h3>
+          <p>
+            In California, residential building permits cluster heavily in coastal metros like Los Angeles, San Diego, and the Bay Area. QOZs are generally located outside these active permit corridors, suggesting a disconnect between where development is actually happening and where tax incentives are offered. In Florida, permits are more spatially dispersed across metropolitan areas, and QOZs more frequently overlap areas with active construction. This indicates stronger alignment between QOZ placement and real development patterns in Florida than in California.
+          </p>
+
+          <h3>Mortgage Clustering (Spatial Statistics)</h3>
+          <p>
+            Global Moran's I confirms that mortgage activity is highly spatially clustered in California (I = 0.356, z = 72.31, p &lt; 0.000001). High-mortgage tracts cluster near other high-mortgage tracts, and low-mortgage tracts do the same, which validates the use of local spatial statistics.
+          </p>
+          <p>
+            The Getis–Ord Gi* hotspot map shows strong mortgage hotspots (95–99% confidence) in the San Francisco Peninsula, Silicon Valley, Oakland, and the Sacramento metro area. Cold spots appear in the Central Valley, rural northern counties, and outer exurban regions. Most QOZs do not intersect strong mortgage hotspots, and they tend to fall in cold spots or not-significant areas. When overlaps do occur, they are usually at the lower 90% confidence level.
+          </p>
+          <p>
+            Local Moran's I reveals four spatial pattern types. High–High clusters (strong mortgage markets) appear in the Bay Area, Sacramento, and Silicon Valley. Low–Low clusters (weak markets) concentrate in the Central Valley and rural northeastern California. High–Low outliers are tracts with high mortgage activity surrounded by low-activity neighbors. They may represent localized redevelopment or early signs of gentrification. Low–High outliers indicate pockets of disinvestment within otherwise active markets. QOZs mostly fall in Low–Low clusters, confirming that they are located in the weakest mortgage markets.
+          </p>
+
+          <p>The interactive map below shows mortgage activity and QOZ boundaries across California.</p>
+
+          <div style="width:100%; margin: 1.2em 0; border: 2px solid #6a3eb7;">
+            <iframe
+              src="https://prattsavi.maps.arcgis.com/apps/instant/basic/index.html?appid=7c6cc688fa9c4c3fac40dcca5456977c"
+              width="100%"
+              height="600"
+              frameborder="0"
+              style="border:0; display:block;"
+              allowfullscreen>
+              iFrames are not supported on this page.
+            </iframe>
+          </div>
+
+          <h3>Rent Change: 2010 to 2023</h3>
+          <p>
+            Rent maps show significant increases in the coastal regions of Los Angeles, the Bay Area, and San Diego. Interior regions remain more affordable, though still rising. QOZs typically appear in tracts with lower rent but often border zones where rents have increased sharply. This suggests that QOZs may be influenced by rising rent from adjacent markets, even if the zones themselves are not currently in areas with high rent. Displacement can potentially occur from this dynamic. Many zones designated for investment sit on the edge of appreciating markets, which creates pressure on existing residents even before development fully materializes.
+          </p>
+
+          <p>The interactive map below shows rent change from 2010 to 2023 alongside QOZ boundaries.</p>
+
+          <div style="width:100%; margin: 1.2em 0; border: 2px solid #6a3eb7;">
+            <iframe
+              src="https://prattsavi.maps.arcgis.com/apps/instant/sidebar/index.html?appid=a6ce279a77814690bcbae4770f516cc1"
+              width="100%"
+              height="600"
+              frameborder="0"
+              style="border:0; display:block;"
+              allowfullscreen>
+              iFrames are not supported on this page.
+            </iframe>
+          </div>
+
+          <h2>Story Map</h2>
+          <p>
+            The full project narrative is presented as an ArcGIS Story Map.
+          </p>
+          <div style="width:100%; margin: 1.2em 0; border: 2px solid #6a3eb7;">
+            <iframe
+              src="https://storymaps.arcgis.com/stories/df00717ab11f496980e980e64786b608"
+              width="100%"
+              height="700"
+              frameborder="0"
+              style="border:0; display:block;"
+              allowfullscreen>
+              iFrames are not supported on this page.
+            </iframe>
+            <div style="padding: 8px 12px; background: #0d0820; font-family: Monaco, monospace; font-size: 12px;">
+              <a href="https://storymaps.arcgis.com/stories/df00717ab11f496980e980e64786b608" target="_blank">↗ Open Story Map in full</a>
+            </div>
+          </div>
+
+          <h2>Key Points</h2>
+          <p>
+            Development alignment differs by state. QOZs in Florida are better positioned relative to new construction than those in California. Mortgage activity is strongly clustered, with QOZs located mainly in low-activity areas. Hotspot analysis shows limited alignment between QOZ locations and regions of strong investment. Localized outlier tracts point to small pockets of possible emerging development. Rent changes highlight rising economic pressure near many tax-incentivized areas. This raises questions about displacement even before the investment fully arrives.
+          </p>
+          <p>
+            Per IRS guidelines, investors do not need to be part of a community before taking advantage of QOZ tax incentives. If the policy goal is to support distressed economies, the focus should be on housing affordability, demographic shifts, and local hiring outcomes before and after incentives are applied.
+          </p>
+
+          <h2>What I Learned</h2>
           <ul>
-            <li>[Finding 1]</li>
-            <li>[Finding 2]</li>
-            <li>[Finding 3]</li>
+            <li>Spatial statistics like Moran's I and Gi* reveal patterns that simple visual inspection of maps can miss</li>
+            <li>The same federal policy can have very different spatial footprints depending on state-level housing market conditions</li>
+            <li>Proximity to high-rent areas matters as much as conditions within QOZ boundaries themselves</li>
+            <li>Intersection and buffer analysis are effective tools for quantifying the gap between where incentives are placed and where activity is occurring</li>
+            <li>Policy evaluation requires layering multiple spatial perspectives rather than any single indicator</li>
           </ul>
 
-          <h2>Visualizations</h2>
-          <p>[Add your maps and charts here.]</p>
-
-          <!-- Example: -->
-          <!-- <img class="full-width-image" src="../img/qoz-map.png" alt="Map of Qualified Opportunity Zones" /> -->
-
-          <h2>Tools & Technologies</h2>
+          <h2>Tools &amp; Technologies</h2>
+          <p>This project used the following tools across three labs:</p>
           <ul>
-            <li>[e.g. Python, GeoPandas, Folium]</li>
-            <li>[e.g. QGIS]</li>
-            <li>[e.g. US Census Bureau data]</li>
+            <li>ArcGIS Pro</li>
+            <li>Python (arcpy)</li>
+            <li>ArcGIS Online</li>
+            <li>ArcGIS StoryMaps</li>
+            <li>R</li>
           </ul>
 
           <hr />
@@ -65,3 +219,5 @@
     </div>
   </body>
 </html>
+
+
