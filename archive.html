@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link href="https://fonts.googleapis.com/css2?family=Handjet&display=swap" rel="stylesheet">
+    <title>Archive — Oriel's Portfolio</title>
+    <meta content="Archived visualizations and short-form project writeups" name="description" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./images/favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="./style.css" rel="stylesheet" />
+    <script src="./layout.js"></script>
+    <style>
+      .archive-grid { display:grid; grid-template-columns:1fr; gap:2.5em; margin-top:1em; }
+      .archive-entry { border:var(--border); border-radius:var(--round-borders); padding:1.4em; background:var(--content-background-color); }
+      .archive-entry-header { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:0.5em; margin-bottom:0.6em; }
+      .archive-entry-title { font-family:var(--heading-font); font-size:1.6em; color:var(--text-color); margin:0; }
+      .archive-entry-meta { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+      .archive-tag { font-family:var(--font); font-size:0.65em; color:var(--link-color); border:1px solid var(--link-color); border-radius:2px; padding:2px 8px; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap; }
+      .archive-year { font-size:0.7em; color:rgba(241,241,241,0.35); font-family:var(--font); }
+      .archive-entry-desc { font-size:0.85em; color:rgba(241,241,241,0.7); line-height:1.6; margin:0 0 1.2em; }
+      .archive-source-link { display:inline-block; margin-top:0.8em; font-size:0.75em; color:var(--link-color); text-decoration:none; letter-spacing:0.04em; }
+      .archive-source-link:hover { color:var(--link-color-hover); }
+      .archive-divider { border:0; border-top:1px solid rgba(106,62,183,0.25); margin:1.4em 0 0; }
+
+      .aave-viz { font-family:Monaco,'Courier New',monospace; }
+      .ctrl-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:0.75rem; }
+      .movie-btn { background:transparent; border:1px solid rgba(106,62,183,0.5); border-radius:2px; padding:4px 10px; font-family:Monaco,monospace; font-size:11px; color:rgba(241,241,241,0.6); cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+      .movie-btn:hover { border-color:#ea7af4; color:#ea7af4; }
+      .movie-btn.active { background:rgba(106,62,183,0.25); border-color:#6a3eb7; color:#ea7af4; }
+      .view-toggle { display:flex; border:1px solid rgba(106,62,183,0.5); border-radius:2px; overflow:hidden; margin-left:auto; }
+      .view-btn { background:transparent; border:none; padding:5px 14px; font-family:Monaco,monospace; font-size:11px; color:rgba(241,241,241,0.6); cursor:pointer; transition:all 0.15s; }
+      .view-btn.active { background:rgba(106,62,183,0.3); color:#ea7af4; }
+      .stats-row { display:flex; gap:12px; flex-wrap:wrap; }
+      .stat-pill { font-size:11px; color:rgba(241,241,241,0.5); border:1px solid rgba(106,62,183,0.3); border-radius:2px; padding:3px 8px; }
+      .stat-pill span { color:#ea7af4; font-weight:500; }
+      #aave-canvas { width:100%; height:420px; position:relative; overflow:hidden; border:1px solid rgba(106,62,183,0.3); border-radius:2px; background:#000; }
+      #aave-canvas svg { position:absolute; top:0; left:0; width:100%; height:100%; }
+      #d3-tooltip { position:absolute; pointer-events:none; background:rgba(10,5,20,0.95); border:1px solid #6a3eb7; border-radius:2px; padding:6px 10px; font-size:11px; color:#f1f1f1; line-height:1.6; z-index:10; display:none; max-width:160px; font-family:Monaco,monospace; }
+      #d3-tooltip strong { color:#ea7af4; }
+
+      #g-wrap { position:relative; width:100%; height:520px; background:#000; border-radius:2px; overflow:hidden; font-family:Monaco,'Courier New',monospace; border:1px solid rgba(106,62,183,0.3); }
+      #g-wrap canvas { display:block; position:absolute; top:0; left:0; }
+      #g-label-layer { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; }
+      .film-label { position:absolute; transform:translate(-50%,-100%); pointer-events:none; white-space:nowrap; }
+      .film-label-inner { font-family:Monaco,'Courier New',monospace; font-size:11px; background:rgba(5,2,15,0.75); border:1px solid rgba(106,62,183,0.6); border-radius:2px; padding:2px 7px; letter-spacing:0.04em; }
+      .film-label-inner span { display:block; font-size:9px; color:rgba(241,241,241,0.4); margin-top:1px; }
+      #g-info { position:absolute; top:12px; left:14px; pointer-events:none; z-index:10; }
+      #g-title-label { font-size:13px; color:#ea7af4; letter-spacing:0.08em; }
+      #g-sub-label { font-size:11px; color:rgba(241,241,241,0.45); margin-top:3px; }
+      #g-tooltip { position:absolute; display:none; background:rgba(5,2,15,0.95); border:1px solid #6a3eb7; border-radius:2px; padding:7px 11px; font-size:11px; color:#f1f1f1; line-height:1.7; pointer-events:none; max-width:180px; z-index:20; font-family:Monaco,monospace; }
+      #g-tooltip strong { color:#ea7af4; display:block; margin-bottom:2px; }
+      #g-hint { position:absolute; bottom:12px; right:14px; font-size:10px; color:rgba(241,241,241,0.3); text-align:right; line-height:1.7; pointer-events:none; z-index:10; }
+      #g-focus-label { position:absolute; top:12px; right:14px; font-size:11px; color:#ea7af4; pointer-events:none; display:none; z-index:10; }
+      #g-legend { position:absolute; bottom:12px; left:14px; display:flex; flex-wrap:wrap; gap:5px; pointer-events:none; max-width:380px; z-index:10; }
+      .g-leg { font-size:9px; color:rgba(241,241,241,0.45); display:flex; align-items:center; gap:4px; }
+      .g-leg-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    </style>
+  </head>
+  <body>
+    <a href="#content" id="skip-to-content-link">Skip to content</a>
+    <div class="layout">
+      <main id="content">
+        <noscript>Please enable JavaScript to view this website!</noscript>
+        <section>
+          <h1>Archive</h1>
+          <p>Smaller-scale visualizations, experiments, and short writeups that don't fit neatly into full project pages — but are worth keeping around.</p>
+          <hr />
+
+          <div class="archive-grid">
+
+            <!-- ENTRY 1: D3 -->
+            <div class="archive-entry">
+              <div class="archive-entry-header">
+                <h2 class="archive-entry-title">AAVE Word Distribution</h2>
+                <div class="archive-entry-meta">
+                  <span class="archive-tag">D3.js</span>
+                  <span class="archive-tag">NLP</span>
+                  <span class="archive-year">2024</span>
+                </div>
+              </div>
+              <p class="archive-entry-desc">Three views of AAVE term frequency across 10 comedy film scripts — force-directed bubble chart, spiral word cloud, and horizontal bar chart. Toggle between films and views to compare lexical density and term distribution. Sphere size encodes raw count; terms appearing across multiple films are highlighted. Part of the broader AAVE NLP analysis project.</p>
+              <div class="aave-viz">
+                <div class="ctrl-row" id="movie-btns"></div>
+                <div class="ctrl-row">
+                  <div class="stats-row" id="stats-row"></div>
+                  <div class="view-toggle">
+                    <button class="view-btn active" onclick="setView('bubble')">bubbles</button>
+                    <button class="view-btn" onclick="setView('cloud')">cloud</button>
+                    <button class="view-btn" onclick="setView('bar')">bars</button>
+                  </div>
+                </div>
+                <div id="aave-canvas">
+                  <svg id="viz-svg"></svg>
+                  <div id="d3-tooltip"></div>
+                </div>
+              </div>
+              <a class="archive-source-link" href="./projects/aave-nlp.html">↗ Full project writeup</a>
+              <hr class="archive-divider" />
+            </div>
+
+            <!-- ENTRY 2: Three.js -->
+            <div class="archive-entry">
+              <div class="archive-entry-header">
+                <h2 class="archive-entry-title">AAVE Galaxy</h2>
+                <div class="archive-entry-meta">
+                  <span class="archive-tag">Three.js</span>
+                  <span class="archive-tag">NLP</span>
+                  <span class="archive-year">2024</span>
+                </div>
+              </div>
+              <p class="archive-entry-desc">3D galaxy where each film is a constellation of orbiting word-spheres. Sphere size encodes term frequency; white spheres are terms shared across 3+ films. Cluster distance reflects cosine similarity — semantically closer films sit nearer each other. Drag to orbit, scroll to zoom, click a cluster to focus.</p>
+              <div id="g-wrap">
+                <div id="g-info">
+                  <div id="g-title-label">AAVE galaxy — 10 films</div>
+                  <div id="g-sub-label">cosine similarity · term frequency · cross-film overlap</div>
+                </div>
+                <div id="g-label-layer"></div>
+                <div id="g-tooltip"></div>
+                <div id="g-hint">drag to orbit · scroll to zoom<br>click a cluster to focus</div>
+                <div id="g-focus-label"></div>
+                <div id="g-legend"></div>
+              </div>
+              <a class="archive-source-link" href="./projects/aave-nlp.html">↗ Full project writeup</a>
+            </div>
+
+            <!-- ENTRY 3: Data Tables -->
+            <div class="archive-entry">
+              <div class="archive-entry-header">
+                <h2 class="archive-entry-title">AAVE Lexical & Similarity Tables</h2>
+                <div class="archive-entry-meta">
+                  <span class="archive-tag">Data Table</span>
+                  <span class="archive-tag">NLP</span>
+                  <span class="archive-year">2024</span>
+                </div>
+              </div>
+              <p class="archive-entry-desc">Four-tab interactive table surfacing per-film AAVE metrics: density overview, detailed term breakdowns by film, top-5 most frequent terms, and cosine similarity scores against a tweet corpus. Low similarity scores across the board suggest that embedding models collapse dialectal variation — AAVE text lands in roughly the same semantic neighborhood as standard English regardless of lexical density.</p>
+
+              <style>
+                .tab-bar { display:flex; gap:0; margin-bottom:0; border-bottom:2px solid #6a3eb7; }
+                .tab-btn { background:rgba(38,37,79,0.6); border:2px solid #6a3eb7; border-bottom:none; color:#f1f1f1; font-family:Monaco,monospace; font-size:11px; padding:7px 14px; cursor:pointer; text-transform:uppercase; letter-spacing:0.08em; margin-right:4px; opacity:0.6; }
+                .tab-btn.active { opacity:1; color:#ea7af4; background:rgba(106,62,183,0.25); }
+                .tab-btn:hover { opacity:1; }
+                .tbl-panel { display:none; }
+                .tbl-panel.active { display:block; }
+                .tbl-fieldset { border:2px solid #6a3eb7; margin:0; padding:0; }
+                .tbl-legend { color:#ea7af4; font-size:11px; padding:0 8px; letter-spacing:0.08em; text-transform:uppercase; }
+                .tbl-table { width:100%; border-collapse:collapse; font-size:12px; font-family:Monaco,monospace; }
+                .tbl-table thead tr { border-bottom:2px solid #6a3eb7; }
+                .tbl-table th { padding:9px 10px; text-align:left; color:#ea7af4; font-size:10px; text-transform:uppercase; letter-spacing:0.1em; white-space:nowrap; }
+                .tbl-table td { padding:8px 10px; border-bottom:1px solid rgba(106,62,183,0.25); color:#f1f1f1; vertical-align:top; }
+                .tbl-table tr:last-child td { border-bottom:none; }
+                .tbl-table tbody tr:hover td { background:rgba(106,62,183,0.12); }
+                .tbl-num { text-align:right !important; font-variant-numeric:tabular-nums; }
+                .tbl-bar-wrap { display:flex; align-items:center; gap:6px; justify-content:flex-end; }
+                .tbl-bar-bg { width:50px; height:5px; background:rgba(106,62,183,0.25); border-radius:3px; overflow:hidden; }
+                .tbl-bar-fill { height:100%; background:#ea7af4; border-radius:3px; }
+                .tbl-movie-name { font-weight:500; }
+                .tbl-rank { color:rgba(241,241,241,0.4); font-size:10px; text-align:center; }
+                .tbl-inner { padding:14px; }
+                .tbl-movie-block { padding:14px 0; border-bottom:1px solid rgba(106,62,183,0.25); }
+                .tbl-movie-block:last-child { border-bottom:none; }
+                .tbl-movie-block h3 { margin:0 0 6px; font-size:13px; color:#ea7af4; font-family:Monaco,monospace; }
+                .tbl-movie-block p { margin:4px 0; font-size:12px; font-family:Monaco,monospace; }
+                .tbl-terms-list { font-size:11px; color:rgba(241,241,241,0.5); margin:4px 0 0; line-height:1.6; font-family:Monaco,monospace; }
+                .tbl-coverage { font-size:11px; color:#ea7af4; font-weight:500; }
+                .tbl-top-block { padding:12px 0; border-bottom:1px solid rgba(106,62,183,0.25); }
+                .tbl-top-block:last-child { border-bottom:none; }
+                .tbl-top-block h4 { margin:0 0 8px; font-size:12px; color:#ea7af4; font-family:Monaco,monospace; }
+                .tbl-top-block ol { margin:0; padding-left:1.4em; font-size:12px; font-family:Monaco,monospace; }
+                .tbl-top-block li { margin-bottom:3px; color:#f1f1f1; }
+                .tbl-top-block li strong { color:#ea7af4; }
+                .tbl-sim-score { color:#ea7af4; font-weight:500; }
+                .tbl-tweets { max-width:240px; font-size:11px; font-family:Monaco,monospace; }
+                .tbl-tweets ol { margin:0; padding-left:1.2em; }
+                .tbl-tweets li { margin-bottom:5px; line-height:1.4; color:rgba(241,241,241,0.5); }
+                .tbl-tweets li strong { color:#ea7af4; }
+              </style>
+
+              <div>
+                <div class="tab-bar">
+                  <button class="tab-btn active" onclick="switchTbl(0)">Overview</button>
+                  <button class="tab-btn" onclick="switchTbl(1)">By Movie</button>
+                  <button class="tab-btn" onclick="switchTbl(2)">Top Terms</button>
+                  <button class="tab-btn" onclick="switchTbl(3)">Similarity</button>
+                </div>
+
+                <div class="tbl-panel active" id="tbl0">
+                  <fieldset class="tbl-fieldset"><legend class="tbl-legend">AAVE Density Overview</legend>
+                    <table class="tbl-table"><thead><tr><th></th><th>Movie</th><th class="tbl-num">Total Words</th><th class="tbl-num">AAVE Terms</th><th class="tbl-num">Density</th><th class="tbl-num">Unique</th></tr></thead>
+                    <tbody id="tbl-overview"></tbody></table>
+                  </fieldset>
+                </div>
+                <div class="tbl-panel" id="tbl1">
+                  <fieldset class="tbl-fieldset"><legend class="tbl-legend">Breakdown by Movie</legend>
+                    <div class="tbl-inner" id="tbl-bymovie"></div>
+                  </fieldset>
+                </div>
+                <div class="tbl-panel" id="tbl2">
+                  <fieldset class="tbl-fieldset"><legend class="tbl-legend">Top Terms by Movie</legend>
+                    <div class="tbl-inner" id="tbl-topterms"></div>
+                  </fieldset>
+                </div>
+                <div class="tbl-panel" id="tbl3">
+                  <fieldset class="tbl-fieldset"><legend class="tbl-legend">Semantic Similarity</legend>
+                    <table class="tbl-table"><thead><tr><th>Movie</th><th class="tbl-num">Year</th><th class="tbl-num">Cosine</th><th class="tbl-num">Mean</th><th class="tbl-num">Max</th><th class="tbl-num">Min</th><th class="tbl-num">Std</th><th class="tbl-tweets">Top 5 Tweets</th></tr></thead>
+                    <tbody id="tbl-sim"></tbody></table>
+                  </fieldset>
+                </div>
+              </div>
+
+              <a class="archive-source-link" href="./projects/aave-nlp.html">↗ Full project writeup</a>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script>
+    (function(){
+      const MOVIES=[
+        {id:0,title:"Tropic Thunder", year:2008,totalWords:21331,aaveCount:157,density:0.74,unique:36, terms:[["if",37],["real",19],["been",19],["fire",10],["mean",10],["bank",4],["beat",6],["bet",5],["cap",3],["carry",4],["cat",2],["chill",4],["din",1],["done",5],["drag",3],["drop",5],["dry",2],["fierce",3],["g",4],["heated",2],["hit",7],["link",2],["mad",5],["mans",4],["n",6],["playin",2],["plug",3],["read",3],["roll",4],["school",6],["serve",2],["slumped",1],["tea",3],["thick",2],["trip",3],["vibe",2]]},
+        {id:1,title:"Next Friday",    year:2000,totalWords:15665,aaveCount:111,density:0.71,unique:25, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["bank",3],["beat",5],["boss",4],["drop",4],["extra",2],["fire",4],["ghetto",3],["ice",3],["laid",2],["mad",4],["mean",5],["n",3],["roll",4],["school",5],["snatched",1],["thick",2],["tight",3],["trash",2],["trip",2],["wig",1]]},
+        {id:2,title:"Superbad",       year:2007,totalWords:15665,aaveCount:111,density:0.71,unique:25, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["bank",3],["beat",5],["boss",4],["drop",4],["extra",2],["fire",4],["ghetto",3],["ice",3],["laid",2],["mad",4],["mean",5],["n",3],["roll",4],["school",5],["snatched",1],["thick",2],["tight",3],["trash",2],["trip",2],["wig",1]]},
+        {id:3,title:"Bridesmaids",    year:2011,totalWords:15665,aaveCount:111,density:0.71,unique:25, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["bank",3],["beat",5],["boss",4],["drop",4],["extra",2],["fire",4],["ghetto",3],["ice",3],["laid",2],["mad",4],["mean",5],["n",3],["roll",4],["school",5],["snatched",1],["thick",2],["tight",3],["trash",2],["trip",2],["wig",1]]},
+        {id:4,title:"Hot Tub TM",     year:2010,totalWords:15665,aaveCount:111,density:0.71,unique:25, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["bank",3],["beat",5],["boss",4],["drop",4],["extra",2],["fire",4],["ghetto",3],["ice",3],["laid",2],["mad",4],["mean",5],["n",3],["roll",4],["school",5],["snatched",1],["thick",2],["tight",3],["trash",2],["trip",2],["wig",1]]},
+        {id:5,title:"Pineapple Exp.", year:2008,totalWords:21970,aaveCount:149,density:0.68,unique:25, terms:[["if",41],["cop",20],["been",18],["hit",14],["school",9],["ate",2],["beat",5],["bet",4],["chill",5],["done",4],["dope",3],["drag",3],["fire",5],["kush",2],["lit",3],["mad",6],["mans",3],["mean",5],["n",4],["read",2],["real",5],["serve",2],["slumped",1],["tea",3],["thick",2]]},
+        {id:6,title:"Harold & Kumar", year:2004,totalWords:25891,aaveCount:153,density:0.59,unique:28, terms:[["if",43],["been",31],["hit",15],["cop",13],["school",9],["beat",5],["beef",3],["carry",3],["chill",4],["dime",2],["done",5],["drag",3],["drop",4],["dry",2],["extra",2],["filthy",2],["fire",4],["laid",2],["lit",3],["mad",5],["mans",4],["mean",5],["n",3],["read",2],["roll",3],["thick",2],["trip",2],["vibe",1]]},
+        {id:7,title:"Scott Pilgrim",  year:2010,totalWords:24627,aaveCount:121,density:0.49,unique:26, terms:[["if",46],["been",16],["school",12],["mean",8],["hit",5],["beat",4],["beef",3],["bet",3],["coin",2],["done",4],["drop",4],["dry",2],["fierce",2],["fire",3],["homies",2],["mad",4],["n",3],["period",1],["pressed",2],["racks",1],["read",2],["real",3],["shade",1],["tea",2],["trash",2],["woke",1]]},
+        {id:8,title:"Ted",            year:2012,totalWords:26819,aaveCount:130,density:0.48,unique:29, terms:[["if",41],["been",23],["mean",8],["hit",8],["beat",4],["boss",4],["carry",3],["chill",5],["cop",4],["done",5],["drag",3],["drop",4],["extra",2],["g",3],["ice",2],["lit",3],["mans",4],["n",4],["plug",2],["read",3],["real",5],["roll",3],["school",7],["shook",1],["tight",3],["trash",2],["wig",1],["woke",2],["bet",2]]},
+        {id:9,title:"The Hangover",   year:2009,totalWords:20568,aaveCount:86, density:0.42,unique:22, terms:[["if",29],["been",15],["real",6],["tight",5],["beat",4],["bank",3],["bet",3],["boss",4],["coin",2],["done",4],["filthy",2],["fire",3],["g",2],["hit",5],["ice",3],["laid",2],["mad",4],["mans",3],["mean",4],["pressed",2],["roll",3],["school",4]]},
+      ];
+      let cur=MOVIES[0], view='bubble', sim=null;
+      const pink='#ea7af4', pinkDim='#a611b1', H=420;
+      const W=()=>document.getElementById('aave-canvas').clientWidth||700;
+
+      function renderBtns(){
+        document.getElementById('movie-btns').innerHTML=MOVIES.map(m=>
+          `<button class="movie-btn${m.id===cur.id?' active':''}" onclick="pickMovie(${m.id})">${m.title}</button>`
+        ).join('');
+      }
+      window.pickMovie=function(id){cur=MOVIES[id];renderBtns();renderStats();renderView();};
+      window.setView=function(v){
+        view=v;
+        document.querySelectorAll('.view-btn').forEach((b,i)=>b.classList.toggle('active',['bubble','cloud','bar'][i]===v));
+        renderView();
+      };
+      function renderStats(){
+        const m=cur;
+        document.getElementById('stats-row').innerHTML=
+          `<div class="stat-pill">total words: <span>${m.totalWords.toLocaleString()}</span></div>`+
+          `<div class="stat-pill">aave terms: <span>${m.aaveCount}</span></div>`+
+          `<div class="stat-pill">density: <span>${m.density.toFixed(2)}%</span></div>`+
+          `<div class="stat-pill">unique: <span>${m.unique}</span></div>`;
+      }
+      function renderView(){
+        if(sim){sim.stop();sim=null;}
+        if(view==='bubble') renderBubble();
+        else if(view==='cloud') renderCloud();
+        else renderBar();
+      }
+      function getSvg(){
+        const svg=d3.select('#viz-svg');
+        svg.selectAll('*').remove();
+        svg.attr('viewBox',`0 0 ${W()} ${H}`);
+        return svg;
+      }
+      function showTip(event,html){
+        const t=document.getElementById('d3-tooltip');
+        t.innerHTML=html; t.style.display='block';
+        const box=document.getElementById('aave-canvas').getBoundingClientRect();
+        let x=event.clientX-box.left+12, y=event.clientY-box.top+12;
+        if(x+170>W()) x-=180; if(y+80>H) y-=80;
+        t.style.left=x+'px'; t.style.top=y+'px';
+      }
+      function hideTip(){document.getElementById('d3-tooltip').style.display='none';}
+
+      function renderBubble(){
+        const svg=getSvg(),w=W(),terms=cur.terms;
+        const maxCount=d3.max(terms,d=>d[1]);
+        const rScale=d3.scaleSqrt().domain([1,maxCount]).range([10,52]);
+        const cScale=d3.scaleSequential().domain([1,maxCount]).interpolator(t=>d3.interpolateRgb('#2d1060','#ea7af4')(t));
+        const nodes=terms.map(([word,count])=>({word,count,r:rScale(count)}));
+        sim=d3.forceSimulation(nodes)
+          .force('charge',d3.forceManyBody().strength(5))
+          .force('center',d3.forceCenter(w/2,H/2))
+          .force('collision',d3.forceCollide(d=>d.r+3))
+          .force('x',d3.forceX(w/2).strength(0.06))
+          .force('y',d3.forceY(H/2).strength(0.08));
+        const g=svg.append('g');
+        const node=g.selectAll('g.node').data(nodes).join('g').attr('class','node').style('cursor','pointer');
+        node.append('circle').attr('r',d=>d.r).attr('fill',d=>cScale(d.count))
+          .attr('stroke',d=>d.count===maxCount?pink:'rgba(234,122,244,0.3)').attr('stroke-width',d=>d.count===maxCount?2:1);
+        node.append('text').attr('text-anchor','middle').attr('dominant-baseline','central')
+          .attr('font-family','Monaco,monospace').attr('font-size',d=>Math.min(d.r*0.55,14)+'px')
+          .attr('fill',d=>d.r<18?'rgba(241,241,241,0.7)':'#f1f1f1').attr('pointer-events','none')
+          .text(d=>d.r<12?'':d.word);
+        node.on('mousemove',(event,d)=>showTip(event,`<strong>${d.word}</strong><br>count: ${d.count}<br>rank: #${cur.terms.findIndex(t=>t[0]===d.word)+1}`))
+            .on('mouseleave',hideTip);
+        sim.on('tick',()=>node.attr('transform',d=>{
+          d.x=Math.max(d.r+2,Math.min(w-d.r-2,d.x));
+          d.y=Math.max(d.r+2,Math.min(H-d.r-2,d.y));
+          return `translate(${d.x},${d.y})`;
+        }));
+      }
+
+      function renderCloud(){
+        const svg=getSvg(),w=W(),terms=cur.terms;
+        const maxCount=d3.max(terms,d=>d[1]);
+        const fsScale=d3.scaleSqrt().domain([1,maxCount]).range([11,52]);
+        const cScale=d3.scaleSequential().domain([1,maxCount]).interpolator(t=>d3.interpolateRgb(pinkDim,pink)(t));
+        const placed=[],cx=w/2,cy=H/2,sorted=[...terms].sort((a,b)=>b[1]-a[1]);
+        svg.append('rect').attr('width',w).attr('height',H).attr('fill','transparent');
+        let angle=0;
+        const spiral=i=>{const r=2.5*i;angle+=0.35;return[cx+r*Math.cos(angle),cy+r*Math.sin(angle)];};
+        const g=svg.append('g');
+        sorted.forEach(([word,count],i)=>{
+          const fs=fsScale(count),charW=fs*0.62,tw=word.length*charW,th=fs*1.2;
+          let [px,py]=i===0?[cx,cy]:spiral(i*6),tries=0;
+          while(tries<200){
+            let ok=true;
+            for(const p of placed) if(Math.abs(px-p.x)<(tw+p.tw)/2+3&&Math.abs(py-p.y)<(th+p.th)/2+3){ok=false;break;}
+            if(ok&&px>tw/2+4&&px<w-tw/2-4&&py>th/2+4&&py<H-th/2-4) break;
+            const [nx,ny]=spiral(i*6+tries);px=nx;py=ny;tries++;
+          }
+          placed.push({x:px,y:py,tw,th});
+          g.append('text').attr('x',px).attr('y',py).attr('text-anchor','middle').attr('dominant-baseline','central')
+            .attr('font-family','Monaco,monospace').attr('font-size',fs+'px').attr('fill',cScale(count))
+            .attr('opacity',0.9).style('cursor','pointer').text(word)
+            .on('mousemove',event=>showTip(event,`<strong>${word}</strong><br>count: ${count}`))
+            .on('mouseleave',hideTip);
+        });
+      }
+
+      function renderBar(){
+        const svg=getSvg(),w=W();
+        const terms=[...cur.terms].sort((a,b)=>b[1]-a[1]).slice(0,20);
+        const margin={top:14,right:20,bottom:36,left:64};
+        const iw=w-margin.left-margin.right,ih=H-margin.top-margin.bottom;
+        const x=d3.scaleLinear().domain([0,d3.max(terms,d=>d[1])]).range([0,iw]);
+        const y=d3.scaleBand().domain(terms.map(d=>d[0])).range([0,ih]).padding(0.25);
+        const g=svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+        const cScale=d3.scaleSequential().domain([0,terms.length]).interpolator(t=>d3.interpolateRgb('#2d1060','#ea7af4')(t));
+        g.selectAll('rect').data(terms).join('rect').attr('y',d=>y(d[0])).attr('height',y.bandwidth())
+          .attr('x',0).attr('width',d=>x(d[1])).attr('fill',(d,i)=>cScale(i)).attr('rx',1).style('cursor','pointer')
+          .on('mousemove',(event,d)=>showTip(event,`<strong>${d[0]}</strong><br>count: ${d[1]}`)).on('mouseleave',hideTip);
+        g.selectAll('text.val').data(terms).join('text').attr('class','val').attr('x',d=>x(d[1])+5)
+          .attr('y',d=>y(d[0])+y.bandwidth()/2).attr('dominant-baseline','central')
+          .attr('font-family','Monaco,monospace').attr('font-size','11px').attr('fill','rgba(241,241,241,0.6)').text(d=>d[1]);
+        const yAxis=g.append('g').call(d3.axisLeft(y).tickSize(0).tickPadding(8));
+        yAxis.select('.domain').remove();
+        yAxis.selectAll('text').attr('font-family','Monaco,monospace').attr('font-size','11px').attr('fill','rgba(241,241,241,0.75)');
+        const xAxis=g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(5).tickSize(-ih));
+        xAxis.select('.domain').remove();
+        xAxis.selectAll('.tick line').attr('stroke','rgba(106,62,183,0.25)').attr('stroke-dasharray','2,2');
+        xAxis.selectAll('text').attr('font-family','Monaco,monospace').attr('font-size','11px').attr('fill','rgba(241,241,241,0.5)');
+      }
+
+      renderBtns(); renderStats(); renderView();
+      window.addEventListener('resize',()=>{if(sim)sim.stop();renderView();});
+    })();
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script>
+        (function(){
+          const MOVIES=[
+            {title:"Tropic Thunder", year:2008,cosine:0.1872,density:0.74,color:0xea7af4, terms:[["if",37],["real",19],["been",19],["fire",10],["mean",10],["hit",7],["n",6],["school",6],["beat",6],["mad",5],["done",5],["drop",5],["bet",5],["mans",4],["roll",4],["carry",4],["g",4],["chill",4],["bank",4],["read",3],["tea",3],["trip",3],["fierce",3],["plug",3],["drag",3],["thick",2],["dry",2],["heated",2],["link",2],["playin",2],["vibe",2],["cap",3],["cat",2],["serve",2],["slumped",1],["din",1]]},
+            {title:"Next Friday",    year:2000,cosine:0.2208,density:0.71,color:0xb06aff, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["mean",5],["school",5],["beat",5],["roll",4],["boss",4],["fire",4],["mad",4],["tight",3],["bank",3],["ghetto",3],["ice",3],["n",3],["trip",2],["extra",2],["laid",2],["thick",2],["trash",2],["drop",4],["snatched",1],["wig",1]]},
+            {title:"Superbad",       year:2007,cosine:0.2013,density:0.71,color:0x7a5fff, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["mean",5],["school",5],["beat",5],["roll",4],["boss",4],["fire",4],["mad",4],["tight",3],["bank",3],["ghetto",3],["ice",3],["n",3],["trip",2],["extra",2],["laid",2],["thick",2],["trash",2],["drop",4],["snatched",1],["wig",1]]},
+            {title:"Bridesmaids",    year:2011,cosine:0.2217,density:0.71,color:0xff6eb4, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["mean",5],["school",5],["beat",5],["roll",4],["boss",4],["fire",4],["mad",4],["tight",3],["bank",3],["ghetto",3],["ice",3],["n",3],["trip",2],["extra",2],["laid",2],["thick",2],["trash",2],["drop",4],["snatched",1],["wig",1]]},
+            {title:"Hot Tub TM",     year:2010,cosine:0.2040,density:0.71,color:0xff4fd8, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["mean",5],["school",5],["beat",5],["roll",4],["boss",4],["fire",4],["mad",4],["tight",3],["bank",3],["ghetto",3],["ice",3],["n",3],["trip",2],["extra",2],["laid",2],["thick",2],["trash",2],["drop",4],["snatched",1],["wig",1]]},
+            {title:"Pineapple Exp.", year:2008,cosine:0.1743,density:0.68,color:0xa78bfa, terms:[["if",41],["cop",20],["been",18],["hit",14],["school",9],["mad",6],["beat",5],["chill",5],["mean",5],["real",5],["fire",5],["bet",4],["done",4],["n",4],["tea",3],["lit",3],["dope",3],["drag",3],["read",2],["serve",2],["thick",2],["kush",2],["ate",2],["slumped",1],["mans",3]]},
+            {title:"Harold & Kumar", year:2004,cosine:0.0892,density:0.59,color:0x67e8f9, terms:[["if",43],["been",31],["hit",15],["cop",13],["school",9],["mad",5],["mean",5],["done",5],["mans",4],["chill",4],["fire",4],["beat",5],["drop",4],["n",3],["read",2],["roll",3],["thick",2],["trip",2],["dry",2],["extra",2],["filthy",2],["dime",2],["laid",2],["lit",3],["beef",3],["carry",3],["drag",3],["vibe",1]]},
+            {title:"Scott Pilgrim",  year:2010,cosine:0.1146,density:0.49,color:0x34d399, terms:[["if",46],["been",16],["school",12],["mean",8],["hit",5],["mad",4],["done",4],["drop",4],["beat",4],["bet",3],["fire",3],["real",3],["n",3],["beef",3],["read",2],["pressed",2],["dry",2],["homies",2],["fierce",2],["coin",2],["tea",2],["trash",2],["racks",1],["period",1],["shade",1],["woke",1]]},
+            {title:"Ted",            year:2012,cosine:0.1471,density:0.48,color:0xfbbf24, terms:[["if",41],["been",23],["mean",8],["hit",8],["school",7],["chill",5],["done",5],["drop",4],["cop",4],["beat",4],["boss",4],["mans",4],["n",4],["real",5],["read",3],["roll",3],["tight",3],["lit",3],["drag",3],["extra",2],["g",3],["ice",2],["bet",2],["carry",3],["plug",2],["trash",2],["wig",1],["woke",2],["shook",1]]},
+            {title:"The Hangover",   year:2009,cosine:0.2339,density:0.42,color:0xf97316, terms:[["if",29],["been",15],["real",6],["tight",5],["hit",5],["beat",4],["boss",4],["done",4],["mad",4],["mean",4],["school",4],["roll",3],["bank",3],["bet",3],["fire",3],["ice",3],["mans",3],["g",2],["filthy",2],["laid",2],["pressed",2],["coin",2]]},
+          ];
+          const wrap=document.getElementById('g-wrap');
+          const labelLayer=document.getElementById('g-label-layer');
+          const W=wrap.clientWidth, H=wrap.clientHeight;
+          const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+          renderer.setSize(W,H); renderer.setPixelRatio(Math.min(window.devicePixelRatio,2)); renderer.setClearColor(0x000000,1);
+          wrap.insertBefore(renderer.domElement,labelLayer);
+          const scene=new THREE.Scene();
+          const camera=new THREE.PerspectiveCamera(55,W/H,0.1,1000); camera.position.set(0,8,38);
+          scene.add(new THREE.AmbientLight(0xffffff,0.4));
+          const pl1=new THREE.PointLight(0xea7af4,1.2,80); pl1.position.set(0,10,10); scene.add(pl1);
+          const pl2=new THREE.PointLight(0x6a3eb7,0.8,80); pl2.position.set(-10,-5,-10); scene.add(pl2);
+          const allTC={};
+          MOVIES.forEach(m=>m.terms.forEach(([w])=>{allTC[w]=(allTC[w]||0)+1;}));
+          const CP=[[-12,3,-4],[10,-2,6],[-6,-5,8],[8,6,-8],[-14,-3,-10],[4,8,4],[-4,4,-12],[14,-6,-2],[0,-8,-6],[6,-4,10]];
+          const movieGroups=[],allSpheres=[],labelEls=[],pivot=new THREE.Group(); scene.add(pivot);
+          MOVIES.forEach((movie,mi)=>{
+            const group=new THREE.Group(); group.position.set(...CP[mi]);
+            const maxC=Math.max(...movie.terms.map(t=>t[1])); const used=[];
+            movie.terms.forEach(([word,count])=>{
+              const r=0.12+(count/maxC)*0.55, shared=allTC[word]>1;
+              const geo=new THREE.SphereGeometry(r,14,10);
+              const mat=new THREE.MeshPhongMaterial({color:shared?0xffffff:movie.color,emissive:shared?0xffffff:movie.color,emissiveIntensity:shared?0.35:0.18,shininess:60,transparent:true,opacity:shared?0.95:0.78});
+              const sphere=new THREE.Mesh(geo,mat);
+              let px,py,pz,tries=0;
+              do{const theta=Math.random()*Math.PI*2,phi=Math.acos(2*Math.random()-1),dist=0.5+Math.random()*3.2;
+                px=dist*Math.sin(phi)*Math.cos(theta);py=dist*Math.sin(phi)*Math.sin(theta);pz=dist*Math.cos(phi);tries++;}
+              while(tries<30&&used.some(u=>Math.hypot(px-u[0],py-u[1],pz-u[2])<r*2.5+0.2));
+              used.push([px,py,pz]); sphere.position.set(px,py,pz);
+              sphere.userData={word,count,movie:movie.title,shared,movieIndex:mi};
+              group.add(sphere); allSpheres.push(sphere);
+            });
+            const core=new THREE.Mesh(new THREE.SphereGeometry(0.22,12,8),new THREE.MeshPhongMaterial({color:movie.color,emissive:movie.color,emissiveIntensity:0.6,shininess:80}));
+            core.userData={isCore:true,movie:movie.title,cosine:movie.cosine,density:movie.density,movieIndex:mi};
+            group.add(core);
+            const hex='#'+movie.color.toString(16).padStart(6,'0');
+            const el=document.createElement('div'); el.className='film-label';
+            el.innerHTML=`<div class="film-label-inner" style="border-color:${hex}88;color:${hex}">${movie.title}<span>${movie.year} · sim ${movie.cosine.toFixed(3)}</span></div>`;
+            labelLayer.appendChild(el);
+            labelEls.push({el,group,offset:new THREE.Vector3(0,4.2,0)});
+            pivot.add(group); movieGroups.push(group);
+          });
+          const sv=[];
+          for(let i=0;i<1400;i++) sv.push((Math.random()-.5)*120,(Math.random()-.5)*120,(Math.random()-.5)*120);
+          const sg=new THREE.BufferGeometry(); sg.setAttribute('position',new THREE.Float32BufferAttribute(sv,3));
+          scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:0.08,transparent:true,opacity:0.5})));
+          const lm=new THREE.LineBasicMaterial({color:0x6a3eb7,transparent:true,opacity:0.18});
+          Object.keys(allTC).filter(w=>allTC[w]>2).forEach(term=>{
+            const inv=MOVIES.filter(m=>m.terms.some(([w])=>w===term));
+            for(let i=0;i<inv.length-1;i++){
+              const a=CP[MOVIES.indexOf(inv[i])],b=CP[MOVIES.indexOf(inv[i+1])];
+              pivot.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a),new THREE.Vector3(...b)]),lm));
+            }
+          });
+          let isDragging=false,pm={x:0,y:0},rotX=0.15,rotY=0,tRX=0.15,tRY=0,zoom=38,tZ=38,focusIdx=-1;
+          const canvas=renderer.domElement; canvas.style.cursor='grab';
+          canvas.addEventListener('mousedown',e=>{isDragging=true;pm={x:e.clientX,y:e.clientY};canvas.style.cursor='grabbing';});
+          canvas.addEventListener('mouseup',()=>{isDragging=false;canvas.style.cursor='grab';});
+          canvas.addEventListener('mouseleave',()=>{isDragging=false;canvas.style.cursor='grab';});
+          canvas.addEventListener('mousemove',e=>{
+            if(isDragging){tRY+=(e.clientX-pm.x)*0.008;tRX+=(e.clientY-pm.y)*0.008;tRX=Math.max(-1.2,Math.min(1.2,tRX));pm={x:e.clientX,y:e.clientY};}
+            hoverG(e);
+          });
+          canvas.addEventListener('wheel',e=>{e.preventDefault();tZ=Math.max(8,Math.min(70,tZ+e.deltaY*0.04));},{passive:false});
+          const rc=new THREE.Raycaster(),mv=new THREE.Vector2();
+          const gtip=document.getElementById('g-tooltip'),gfl=document.getElementById('g-focus-label');
+          function hoverG(e){
+            const rect=canvas.getBoundingClientRect();
+            mv.x=((e.clientX-rect.left)/rect.width)*2-1; mv.y=-((e.clientY-rect.top)/rect.height)*2+1;
+            rc.setFromCamera(mv,camera);
+            const hits=rc.intersectObjects(allSpheres);
+            if(hits.length>0){
+              const d=hits[0].object.userData; canvas.style.cursor=isDragging?'grabbing':'pointer';
+              const html=d.isCore?`<strong>${d.movie}</strong>cosine sim: ${d.cosine.toFixed(4)}<br>density: ${d.density.toFixed(2)}%`:`<strong>${d.word}</strong>${d.movie}<br>count: ${d.count}${d.shared?'<br><span style="color:#67e8f9;font-size:10px">shared across films</span>':''}`;
+              gtip.innerHTML=html; gtip.style.display='block';
+              const wr=wrap.getBoundingClientRect(); gtip.style.left=(e.clientX-wr.left+14)+'px'; gtip.style.top=(e.clientY-wr.top+14)+'px';
+            } else {gtip.style.display='none'; canvas.style.cursor=isDragging?'grabbing':'grab';}
+          }
+          canvas.addEventListener('click',e=>{
+            const rect=canvas.getBoundingClientRect();
+            mv.x=((e.clientX-rect.left)/rect.width)*2-1; mv.y=-((e.clientY-rect.top)/rect.height)*2+1;
+            rc.setFromCamera(mv,camera);
+            const hits=rc.intersectObjects(allSpheres);
+            if(hits.length>0){
+              const mi=hits[0].object.userData.movieIndex; if(mi===undefined) return;
+              if(focusIdx===mi){
+                focusIdx=-1;tZ=38;gfl.style.display='none';
+                movieGroups.forEach(g=>g.traverse(o=>{if(o.isMesh)o.material.opacity=o.userData.shared?0.95:0.78;}));
+                labelEls.forEach(l=>{l.el.style.opacity='1';});
+              } else {
+                focusIdx=mi; tZ=18; tRY=-Math.atan2(CP[mi][0],CP[mi][2]);
+                gfl.textContent=MOVIES[mi].title+' — click again to reset'; gfl.style.display='block';
+                movieGroups.forEach((g,gi)=>g.traverse(o=>{if(o.isMesh)o.material.opacity=gi===mi?(o.userData.shared?0.98:0.9):0.06;}));
+                labelEls.forEach((l,li)=>{l.el.style.opacity=li===mi?'1':'0.15';});
+              }
+            }
+          });
+          const legend=document.getElementById('g-legend');
+          MOVIES.forEach(m=>{const hex='#'+m.color.toString(16).padStart(6,'0'); legend.innerHTML+=`<div class="g-leg"><div class="g-leg-dot" style="background:${hex}"></div><span>${m.title}</span></div>`;});
+          const v3=new THREE.Vector3(); let t=0;
+          function updateLabels(){
+            labelEls.forEach(({el,group,offset})=>{
+              v3.copy(group.position).add(offset); pivot.localToWorld(v3);
+              const p=v3.clone().project(camera);
+              if(p.z>1){el.style.display='none';return;}
+              el.style.display='block'; el.style.left=(p.x*0.5+0.5)*W+'px'; el.style.top=(-p.y*0.5+0.5)*H+'px';
+            });
+          }
+          function animate(){
+            requestAnimationFrame(animate); t+=0.004;
+            rotX+=(tRX-rotX)*0.06; rotY+=(tRY-rotY)*0.06; zoom+=(tZ-zoom)*0.06;
+            pivot.rotation.x=rotX; pivot.rotation.y=rotY; camera.position.z=zoom;
+            movieGroups.forEach((g,gi)=>{g.rotation.y=t*(0.06+gi*0.008)*(gi%2===0?1:-1);});
+            pl1.position.x=Math.sin(t*0.5)*15; pl1.position.z=Math.cos(t*0.5)*15;
+            updateLabels(); renderer.render(scene,camera);
+          }
+          animate();
+        })();
+        </script>
+
+        <script>
+    (function(){
+      const overviewData=[["Tropic Thunder",21331,157,0.74,36],["Next Friday",15665,111,0.71,25],["Superbad",15665,111,0.71,25],["Bridesmaids",15665,111,0.71,25],["Hot Tub Time Machine",15665,111,0.71,25],["Pineapple Express",21970,149,0.68,25],["Harold & Kumar",25891,153,0.59,28],["Scott Pilgrim",24627,121,0.49,26],["Ted",26819,130,0.48,29],["The Hangover",20568,86,0.42,22]];
+      const byMovieData=[
+        {title:"Next Friday (2000)",coverage:"10.55%",terms:"bank, beat, been, boss, drop, extra, fire, ghetto, hit, ice, if, imma, laid, mad, mean, n, real, roll, school, snatched, thick, tight, trash, trip, wig"},
+        {title:"Superbad (2007)",coverage:"10.55%",terms:"bank, beat, been, boss, drop, extra, fire, ghetto, hit, ice, if, imma, laid, mad, mean, n, real, roll, school, snatched, thick, tight, trash, trip, wig"},
+        {title:"Bridesmaids (2011)",coverage:"10.55%",terms:"bank, beat, been, boss, drop, extra, fire, ghetto, hit, ice, if, imma, laid, mad, mean, n, real, roll, school, snatched, thick, tight, trash, trip, wig"},
+        {title:"Hot Tub Time Machine (2010)",coverage:"10.55%",terms:"bank, beat, been, boss, drop, extra, fire, ghetto, hit, ice, if, imma, laid, mad, mean, n, real, roll, school, snatched, thick, tight, trash, trip, wig"},
+        {title:"Harold & Kumar (2004)",coverage:"11.81%",terms:"beat, beef, been, carry, chill, cop, dime, done, dope, drag, drop, dry, extra, filthy, fire, hit, if, laid, lit, mad, mans, mean, n, read, roll, school, thick, trip"},
+        {title:"The Hangover (2009)",coverage:"9.28%",terms:"bank, beat, been, bet, boss, coin, done, filthy, fire, g, hit, ice, if, laid, mad, mans, mean, pressed, real, roll, school, tight"},
+        {title:"Scott Pilgrim (2010)",coverage:"10.97%",terms:"beat, beef, been, bet, coin, done, drop, dry, fierce, fire, hit, homies, if, mad, mean, n, period, pressed, racks, read, real, school, shade, tea, trash, woke"},
+        {title:"Pineapple Express (2008)",coverage:"10.55%",terms:"ate, beat, been, bet, chill, cop, done, dope, drag, fire, hit, if, kush, lit, mad, mans, mean, n, read, real, school, serve, slumped, tea, thick"},
+        {title:"Ted (2012)",coverage:"12.24%",terms:"beat, been, bet, boss, carry, chill, cop, done, drag, drop, extra, g, hit, ice, if, lit, mans, mean, n, plug, read, real, roll, school, shook, tight, trash, wig, woke"},
+        {title:"Tropic Thunder (2008)",coverage:"15.19% (highest)",terms:"bank, beat, been, bet, cap, carry, cat, chill, din, done, drag, drop, dry, fierce, fire, g, heated, hit, if, link, mad, mans, mean, n, playin, plug, read, real, roll, school, serve, slumped, tea, thick, trip, vibe"},
+      ];
+      const topTermsData=[
+        {title:"Next Friday (2000)",terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6]]},
+        {title:"Superbad (2007)",terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6]]},
+        {title:"Bridesmaids (2011)",terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6]]},
+        {title:"Hot Tub Time Machine (2010)",terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6]]},
+        {title:"Harold & Kumar (2004)",terms:[["if",43],["been",31],["hit",15],["cop",13],["school",9]]},
+        {title:"The Hangover (2009)",terms:[["if",29],["been",15],["real",6],["tight",5],["beat",4]]},
+        {title:"Scott Pilgrim (2010)",terms:[["if",46],["been",16],["school",12],["mean",8],["hit",5]]},
+        {title:"Pineapple Express (2008)",terms:[["if",41],["cop",20],["been",18],["hit",14],["school",9]]},
+        {title:"Ted (2012)",terms:[["if",41],["been",23],["mean",8],["hit",8],["beat",4]]},
+        {title:"Tropic Thunder (2008)",terms:[["if",37],["real",19],["been",19],["fire",10],["mean",10]]},
+      ];
+      const simData=[
+        {movie:"Next Friday",year:2000,cosine:0.2208,mean:0.1268,max:0.3536,min:-0.0911,std:0.0597,tweets:[["0.3536","cops touching on kids again its in the dna shopblack..."],["0.3226","heard someone getting their life slapped out of them in target..."],["0.3170","i aint got time to be black friday shopping..."],["0.3170","i aint got time to be black friday shopping..."],["0.3042","when youre talkin slick smokin one on the porch..."]]},
+        {movie:"Superbad",year:2007,cosine:0.2013,mean:0.1156,max:0.3176,min:-0.0867,std:0.0604,tweets:[["0.3176","the throws in a diversity montage oscars..."],["0.3056","sequels remakes amp oscarssowhite..."],["0.3029","that adhd show presents oscarssowhite..."],["0.3015","will watch now but oscarssowhite..."],["0.3001","thank you for being true to urself oscarssowhite..."]]},
+        {movie:"Bridesmaids",year:2011,cosine:0.2217,mean:0.1274,max:0.3421,min:-0.0500,std:0.0692,tweets:[["0.3421","the odd couple oscarssowhite..."],["0.3308","auntie you still single thanksgivingclapback..."],["0.3176","speaking of the oscars oscarssowhite..."],["0.3149","aunt you still wearing them fake weaves..."],["0.3121","aunt didnt you wear that last year..."]]},
+        {movie:"The Hangover",year:2009,cosine:0.2339,mean:0.1344,max:0.3603,min:-0.0857,std:0.0774,tweets:[["0.3603","u look like ure hungover n strugglin thanksgivingclapback..."],["0.3272","thanksgivingclapback latino edition..."],["0.3151","most wonderful time of the year thanksgivingclapback..."],["0.3146","looking for some giggles thanksgivingclapback..."],["0.3140","im laughing so hard reading thanksgivingclapback..."]]},
+        {movie:"Hot Tub TM",year:2010,cosine:0.2040,mean:0.1172,max:0.3534,min:-0.0808,std:0.0714,tweets:[["0.3534","and thats how you hershey hersheyparkhappy blackmoms..."],["0.3334","crazy uncle you have on too much makeup thanksgivingclapback..."],["0.3330","and thats how you hershey hersheyparkhappy..."],["0.3245","grandma pick up yo pants thanksgivingclapback..."],["0.3093","mom this mac amp cheese kinda dry thanksgivingclapback..."]]},
+        {movie:"Harold & Kumar",year:2004,cosine:0.0892,mean:0.0512,max:0.3035,min:-0.1327,std:0.0744,tweets:[["0.3035","white hollywood cartoon oscarssowhite..."],["0.2975","and the oscar goes to this white person..."],["0.2704","hollywood we have a problem oscarssowhite..."],["0.2686","oscars opt for a rather white poster..."],["0.2631","trying to write about oscarnoms oscarssowhite..."]]},
+        {movie:"Scott Pilgrim",year:2010,cosine:0.1146,mean:0.0658,max:0.2399,min:-0.1304,std:0.0514,tweets:[["0.2399","november thanksgiving thanksgivingclapback..."],["0.2283","print edition thanksgivingclapback..."],["0.2218","controversies over oscarssowhite and selmamovie..."],["0.2073","history vs movie selmamovie oscarssowhite..."],["0.2071","aunt all u do is stay on that spacebook thanksgivingclapback..."]]},
+        {movie:"Pineapple Express",year:2008,cosine:0.1743,mean:0.1001,max:0.2686,min:-0.0517,std:0.0461,tweets:[["0.2686","oscarssowhite they dont see color..."],["0.2572","white on white good oscarssowhite..."],["0.2468","best article on oscars oscarssowhite oscarssomale..."],["0.2398","mom you want white or dark meat..."],["0.2324","if you dont want another oscarssowhite..."]]},
+        {movie:"Ted",year:2012,cosine:0.1471,mean:0.0845,max:0.3340,min:-0.0860,std:0.0523,tweets:[["0.3340","podcast with oscarssowhite arrow theflash..."],["0.2909","rob rogers cartoon oscars oscarssowhite..."],["0.2417","uncle jimmy im leaving because i heard you were coming..."],["0.2340","conan tells it how it is oscarssowhite..."],["0.2196","that adhd show presents oscarssowhite..."]]},
+        {movie:"Tropic Thunder",year:2008,cosine:0.1872,mean:0.1076,max:0.3101,min:-0.0604,std:0.0516,tweets:[["0.3101","selmas ava duvernay teaming up for hurricane katrina movie..."],["0.2965","juno turned new england white oscarssowhite..."],["0.2903","history vs movie selmamovie oscarssowhite..."],["0.2767","all this snow not as white as the oscars oscarssowhite..."],["0.2726","oscarssowhite they named the winter storm juno..."]]},
+      ];
+
+      const ob=document.getElementById('tbl-overview');
+      overviewData.forEach(([movie,words,terms,density,unique],i)=>{
+        const pct=(density/0.74)*100;
+        ob.innerHTML+=`<tr><td class="tbl-rank">${i+1}</td><td class="tbl-movie-name">${movie}</td><td class="tbl-num">${words.toLocaleString()}</td><td class="tbl-num">${terms}</td><td class="tbl-num"><div class="tbl-bar-wrap"><span>${density.toFixed(2)}%</span><div class="tbl-bar-bg"><div class="tbl-bar-fill" style="width:${pct}%"></div></div></div></td><td class="tbl-num">${unique}</td></tr>`;
+      });
+
+      const bm=document.getElementById('tbl-bymovie');
+      byMovieData.forEach(d=>{
+        bm.innerHTML+=`<div class="tbl-movie-block"><h3>${d.title}</h3><p><span class="tbl-coverage">AAVE Coverage: ${d.coverage}</span></p><p class="tbl-terms-list"><strong style="color:rgba(241,241,241,0.4);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;">Unique Terms:</strong><br>${d.terms}</p></div>`;
+      });
+
+      const tt=document.getElementById('tbl-topterms');
+      topTermsData.forEach(d=>{
+        const items=d.terms.map(([t,c])=>`<li><strong>${t}</strong> — ${c} occurrences</li>`).join('');
+        tt.innerHTML+=`<div class="tbl-top-block"><h4>${d.title}</h4><ol>${items}</ol></div>`;
+      });
+
+      const sb=document.getElementById('tbl-sim');
+      simData.forEach(d=>{
+        const tweets=d.tweets.map(([s,t])=>`<li><strong>${s}</strong> – ${t}</li>`).join('');
+        sb.innerHTML+=`<tr><td class="tbl-movie-name">${d.movie}</td><td class="tbl-num">${d.year}</td><td class="tbl-sim-score">${d.cosine.toFixed(4)}</td><td class="tbl-num">${d.mean.toFixed(4)}</td><td class="tbl-num">${d.max.toFixed(4)}</td><td class="tbl-num">${d.min.toFixed(4)}</td><td class="tbl-num">${d.std.toFixed(4)}</td><td class="tbl-tweets"><ol>${tweets}</ol></td></tr>`;
+      });
+
+      window.switchTbl=function(idx){
+        document.querySelectorAll('.tbl-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
+        document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+      };
+    })();
+    </script>
+  </body>
+</html>

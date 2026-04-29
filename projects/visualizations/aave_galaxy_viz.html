@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AAVE Galaxy — Oriel's Portfolio</title>
+<style>
+  body { margin: 0; padding: 0; background: #000; }
+  #g-wrap { position:relative; width:100%; height:560px; background:#000; border-radius:2px; overflow:hidden; font-family:Monaco,'Courier New',monospace; }
+  #g-wrap canvas { display:block; position:absolute; top:0; left:0; }
+  #g-label-layer { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; }
+  .film-label { position:absolute; transform:translate(-50%,-100%); pointer-events:none; white-space:nowrap; }
+  .film-label-inner { font-family:Monaco,'Courier New',monospace; font-size:11px; color:#f1f1f1; background:rgba(5,2,15,0.75); border:1px solid rgba(106,62,183,0.6); border-radius:2px; padding:2px 7px; letter-spacing:0.04em; }
+  .film-label-inner span { display:block; font-size:9px; color:rgba(241,241,241,0.4); margin-top:1px; }
+  #g-info { position:absolute; top:12px; left:14px; pointer-events:none; z-index:10; }
+  #g-title { font-size:13px; color:#ea7af4; letter-spacing:0.08em; }
+  #g-sub { font-size:11px; color:rgba(241,241,241,0.45); margin-top:3px; }
+  #g-tooltip { position:absolute; display:none; background:rgba(5,2,15,0.95); border:1px solid #6a3eb7; border-radius:2px; padding:7px 11px; font-size:11px; color:#f1f1f1; line-height:1.7; pointer-events:none; max-width:180px; z-index:20; }
+  #g-tooltip strong { color:#ea7af4; display:block; margin-bottom:2px; }
+  #g-hint { position:absolute; bottom:12px; right:14px; font-size:10px; color:rgba(241,241,241,0.3); text-align:right; line-height:1.7; pointer-events:none; z-index:10; }
+  #g-focus-label { position:absolute; top:12px; right:14px; font-size:11px; color:#ea7af4; pointer-events:none; display:none; z-index:10; }
+  #g-legend { position:absolute; bottom:12px; left:14px; display:flex; flex-wrap:wrap; gap:5px; pointer-events:none; max-width:360px; z-index:10; }
+  .g-leg { font-size:9px; color:rgba(241,241,241,0.45); display:flex; align-items:center; gap:4px; }
+  .g-leg-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+</style>
+</head>
+<body>
+
+<div id="g-wrap">
+  <div id="g-info">
+    <div id="g-title">AAVE galaxy — 10 films</div>
+    <div id="g-sub">cosine similarity · term frequency · cross-film overlap</div>
+  </div>
+  <div id="g-label-layer"></div>
+  <div id="g-tooltip"></div>
+  <div id="g-hint">drag to orbit · scroll to zoom<br>click a cluster to focus</div>
+  <div id="g-focus-label"></div>
+  <div id="g-legend"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const MOVIES = [
+  { title:"Tropic Thunder",  year:2008, cosine:0.1872, density:0.74, color:0xea7af4,
+    terms:[["if",37],["real",19],["been",19],["fire",10],["mean",10],["hit",7],["n",6],["school",6],["beat",6],["mad",5],["done",5],["drop",5],["bet",5],["mans",4],["roll",4],["carry",4],["g",4],["chill",4],["bank",4],["read",3],["tea",3],["trip",3],["fierce",3],["plug",3],["drag",3],["thick",2],["dry",2],["heated",2],["link",2],["playin",2],["vibe",2],["cap",3],["cat",2],["serve",2],["slumped",1],["din",1]]},
+  { title:"Next Friday",     year:2000, cosine:0.2208, density:0.71, color:0xb06aff,
+    terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["mean",5],["school",5],["beat",5],["roll",4],["boss",4],["fire",4],["mad",4],["tight",3],["bank",3],["ghetto",3],["ice",3],["n",3],["trip",2],["extra",2],["laid",2],["thick",2],["trash",2],["drop",4],["snatched",1],["wig",1]]},
+  { title:"Superbad",        year:2007, cosine:0.2013, density:0.71, color:0x7a5fff,
+    terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["mean",5],["school",5],["beat",5],["roll",4],["boss",4],["fire",4],["mad",4],["tight",3],["bank",3],["ghetto",3],["ice",3],["n",3],["trip",2],["extra",2],["laid",2],["thick",2],["trash",2],["drop",4],["snatched",1],["wig",1]]},
+  { title:"Bridesmaids",     year:2011, cosine:0.2217, density:0.71, color:0xff6eb4,
+    terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["mean",5],["school",5],["beat",5],["roll",4],["boss",4],["fire",4],["mad",4],["tight",3],["bank",3],["ghetto",3],["ice",3],["n",3],["trip",2],["extra",2],["laid",2],["thick",2],["trash",2],["drop",4],["snatched",1],["wig",1]]},
+  { title:"Hot Tub TM",      year:2010, cosine:0.2040, density:0.71, color:0xff4fd8,
+    terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["mean",5],["school",5],["beat",5],["roll",4],["boss",4],["fire",4],["mad",4],["tight",3],["bank",3],["ghetto",3],["ice",3],["n",3],["trip",2],["extra",2],["laid",2],["thick",2],["trash",2],["drop",4],["snatched",1],["wig",1]]},
+  { title:"Pineapple Exp.",  year:2008, cosine:0.1743, density:0.68, color:0xa78bfa,
+    terms:[["if",41],["cop",20],["been",18],["hit",14],["school",9],["mad",6],["beat",5],["chill",5],["mean",5],["real",5],["fire",5],["bet",4],["done",4],["n",4],["tea",3],["lit",3],["dope",3],["drag",3],["read",2],["serve",2],["thick",2],["kush",2],["ate",2],["slumped",1],["mans",3]]},
+  { title:"Harold & Kumar",  year:2004, cosine:0.0892, density:0.59, color:0x67e8f9,
+    terms:[["if",43],["been",31],["hit",15],["cop",13],["school",9],["mad",5],["mean",5],["done",5],["mans",4],["chill",4],["fire",4],["beat",5],["drop",4],["n",3],["read",2],["roll",3],["thick",2],["trip",2],["dry",2],["extra",2],["filthy",2],["dime",2],["laid",2],["lit",3],["beef",3],["carry",3],["drag",3],["vibe",1]]},
+  { title:"Scott Pilgrim",   year:2010, cosine:0.1146, density:0.49, color:0x34d399,
+    terms:[["if",46],["been",16],["school",12],["mean",8],["hit",5],["mad",4],["done",4],["drop",4],["beat",4],["bet",3],["fire",3],["real",3],["n",3],["beef",3],["read",2],["pressed",2],["dry",2],["homies",2],["fierce",2],["coin",2],["tea",2],["trash",2],["racks",1],["period",1],["shade",1],["woke",1]]},
+  { title:"Ted",             year:2012, cosine:0.1471, density:0.48, color:0xfbbf24,
+    terms:[["if",41],["been",23],["mean",8],["hit",8],["school",7],["chill",5],["done",5],["drop",4],["cop",4],["beat",4],["boss",4],["mans",4],["n",4],["real",5],["read",3],["roll",3],["tight",3],["lit",3],["drag",3],["extra",2],["g",3],["ice",2],["bet",2],["carry",3],["plug",2],["trash",2],["wig",1],["woke",2],["shook",1]]},
+  { title:"The Hangover",    year:2009, cosine:0.2339, density:0.42, color:0xf97316,
+    terms:[["if",29],["been",15],["real",6],["tight",5],["hit",5],["beat",4],["boss",4],["done",4],["mad",4],["mean",4],["school",4],["roll",3],["bank",3],["bet",3],["fire",3],["ice",3],["mans",3],["g",2],["filthy",2],["laid",2],["pressed",2],["coin",2]]},
+];
+
+const wrap = document.getElementById('g-wrap');
+const labelLayer = document.getElementById('g-label-layer');
+const W = wrap.clientWidth, H = wrap.clientHeight;
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
+renderer.setSize(W, H);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setClearColor(0x000000,1);
+wrap.insertBefore(renderer.domElement, labelLayer);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 1000);
+camera.position.set(0, 8, 38);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+const pl1 = new THREE.PointLight(0xea7af4, 1.2, 80);
+pl1.position.set(0,10,10); scene.add(pl1);
+const pl2 = new THREE.PointLight(0x6a3eb7, 0.8, 80);
+pl2.position.set(-10,-5,-10); scene.add(pl2);
+
+const allTermCounts = {};
+MOVIES.forEach(m => m.terms.forEach(([w]) => { allTermCounts[w]=(allTermCounts[w]||0)+1; }));
+
+const clusterPositions = [
+  [-12,3,-4],[10,-2,6],[-6,-5,8],[8,6,-8],[-14,-3,-10],
+  [4,8,4],[-4,4,-12],[14,-6,-2],[0,-8,-6],[6,-4,10]
+];
+
+const movieGroups = [];
+const allSpheres = [];
+const labelEls = [];
+const pivot = new THREE.Group();
+scene.add(pivot);
+
+MOVIES.forEach((movie, mi) => {
+  const group = new THREE.Group();
+  const [cx,cy,cz] = clusterPositions[mi];
+  group.position.set(cx,cy,cz);
+
+  const maxCount = Math.max(...movie.terms.map(t=>t[1]));
+  const used = [];
+
+  movie.terms.forEach(([word,count]) => {
+    const r = 0.12 + (count/maxCount)*0.55;
+    const shared = allTermCounts[word] > 1;
+    const geo = new THREE.SphereGeometry(r,14,10);
+    const mat = new THREE.MeshPhongMaterial({
+      color: shared ? 0xffffff : movie.color,
+      emissive: shared ? 0xffffff : movie.color,
+      emissiveIntensity: shared ? 0.35 : 0.18,
+      shininess: 60, transparent:true,
+      opacity: shared ? 0.95 : 0.78,
+    });
+    const sphere = new THREE.Mesh(geo,mat);
+
+    let px,py,pz,tries=0;
+    do {
+      const theta = Math.random()*Math.PI*2;
+      const phi = Math.acos(2*Math.random()-1);
+      const dist = 0.5+Math.random()*3.2;
+      px = dist*Math.sin(phi)*Math.cos(theta);
+      py = dist*Math.sin(phi)*Math.sin(theta);
+      pz = dist*Math.cos(phi);
+      tries++;
+    } while(tries<30 && used.some(u=>Math.hypot(px-u[0],py-u[1],pz-u[2])<r*2.5+0.2));
+    used.push([px,py,pz]);
+
+    sphere.position.set(px,py,pz);
+    sphere.userData = { word, count, movie:movie.title, shared, movieIndex:mi };
+    group.add(sphere);
+    allSpheres.push(sphere);
+  });
+
+  const coreGeo = new THREE.SphereGeometry(0.22,12,8);
+  const coreMat = new THREE.MeshPhongMaterial({ color:movie.color, emissive:movie.color, emissiveIntensity:0.6, shininess:80 });
+  const core = new THREE.Mesh(coreGeo,coreMat);
+  core.userData = { isCore:true, movie:movie.title, cosine:movie.cosine, density:movie.density, movieIndex:mi };
+  group.add(core);
+
+  const hex = '#'+movie.color.toString(16).padStart(6,'0');
+  const labelEl = document.createElement('div');
+  labelEl.className = 'film-label';
+  labelEl.innerHTML = `<div class="film-label-inner" style="border-color:${hex}88;color:${hex}">${movie.title}<span>${movie.year} · sim ${movie.cosine.toFixed(3)}</span></div>`;
+  labelLayer.appendChild(labelEl);
+  labelEls.push({ el:labelEl, group, offset:new THREE.Vector3(0,4.2,0) });
+
+  pivot.add(group);
+  movieGroups.push(group);
+});
+
+const starGeo = new THREE.BufferGeometry();
+const sv = [];
+for(let i=0;i<1400;i++) sv.push((Math.random()-.5)*120,(Math.random()-.5)*120,(Math.random()-.5)*120);
+starGeo.setAttribute('position',new THREE.Float32BufferAttribute(sv,3));
+scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:0.08,transparent:true,opacity:0.5})));
+
+const lineMat = new THREE.LineBasicMaterial({color:0x6a3eb7,transparent:true,opacity:0.18});
+Object.keys(allTermCounts).filter(w=>allTermCounts[w]>2).forEach(term => {
+  const involved = MOVIES.filter(m=>m.terms.some(([w])=>w===term));
+  for(let i=0;i<involved.length-1;i++){
+    const a=clusterPositions[MOVIES.indexOf(involved[i])];
+    const b=clusterPositions[MOVIES.indexOf(involved[i+1])];
+    const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a),new THREE.Vector3(...b)]);
+    pivot.add(new THREE.Line(geo,lineMat));
+  }
+});
+
+let isDragging=false, prevMouse={x:0,y:0};
+let rotX=0.15, rotY=0, targetRotX=0.15, targetRotY=0;
+let zoom=38, targetZoom=38;
+let focusIndex=-1;
+
+const canvas = renderer.domElement;
+canvas.style.cursor='grab';
+
+canvas.addEventListener('mousedown',e=>{isDragging=true;prevMouse={x:e.clientX,y:e.clientY};canvas.style.cursor='grabbing';});
+canvas.addEventListener('mouseup',()=>{isDragging=false;canvas.style.cursor='grab';});
+canvas.addEventListener('mouseleave',()=>{isDragging=false;canvas.style.cursor='grab';});
+canvas.addEventListener('mousemove',e=>{
+  if(isDragging){
+    targetRotY+=(e.clientX-prevMouse.x)*0.008;
+    targetRotX+=(e.clientY-prevMouse.y)*0.008;
+    targetRotX=Math.max(-1.2,Math.min(1.2,targetRotX));
+    prevMouse={x:e.clientX,y:e.clientY};
+  }
+  handleHover(e);
+});
+canvas.addEventListener('wheel',e=>{e.preventDefault();targetZoom=Math.max(8,Math.min(70,targetZoom+e.deltaY*0.04));},{passive:false});
+
+const raycaster=new THREE.Raycaster();
+const mouse=new THREE.Vector2();
+const tip=document.getElementById('g-tooltip');
+const focusLabel=document.getElementById('g-focus-label');
+
+function handleHover(e){
+  const rect=canvas.getBoundingClientRect();
+  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+  const hits=raycaster.intersectObjects(allSpheres);
+  if(hits.length>0){
+    const d=hits[0].object.userData;
+    canvas.style.cursor=isDragging?'grabbing':'pointer';
+    const html=d.isCore
+      ?`<strong>${d.movie}</strong>cosine sim: ${d.cosine.toFixed(4)}<br>density: ${d.density.toFixed(2)}%`
+      :`<strong>${d.word}</strong>${d.movie}<br>count: ${d.count}${d.shared?'<br><span style="color:#67e8f9;font-size:10px">shared across films</span>':''}`;
+    tip.innerHTML=html;
+    tip.style.display='block';
+    const wRect=wrap.getBoundingClientRect();
+    tip.style.left=(e.clientX-wRect.left+14)+'px';
+    tip.style.top=(e.clientY-wRect.top+14)+'px';
+  } else {
+    tip.style.display='none';
+    canvas.style.cursor=isDragging?'grabbing':'grab';
+  }
+}
+
+canvas.addEventListener('click',e=>{
+  const rect=canvas.getBoundingClientRect();
+  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+  const hits=raycaster.intersectObjects(allSpheres);
+  if(hits.length>0){
+    const mi=hits[0].object.userData.movieIndex;
+    if(mi===undefined) return;
+    if(focusIndex===mi){
+      focusIndex=-1; targetZoom=38;
+      focusLabel.style.display='none';
+      movieGroups.forEach(g=>g.traverse(o=>{if(o.isMesh)o.material.opacity=o.userData.shared?0.95:0.78;}));
+      labelEls.forEach(l=>{ l.el.style.opacity='1'; });
+    } else {
+      focusIndex=mi;
+      const pos=clusterPositions[mi];
+      targetZoom=18;
+      targetRotY=-Math.atan2(pos[0],pos[2]);
+      focusLabel.textContent=MOVIES[mi].title+' — click again to reset';
+      focusLabel.style.display='block';
+      movieGroups.forEach((g,gi)=>g.traverse(o=>{
+        if(o.isMesh) o.material.opacity=gi===mi?(o.userData.shared?0.98:0.9):0.06;
+      }));
+      labelEls.forEach((l,li)=>{ l.el.style.opacity=li===mi?'1':'0.15'; });
+    }
+  }
+});
+
+const legend=document.getElementById('g-legend');
+MOVIES.forEach(m=>{
+  const hex='#'+m.color.toString(16).padStart(6,'0');
+  legend.innerHTML+=`<div class="g-leg"><div class="g-leg-dot" style="background:${hex}"></div><span>${m.title}</span></div>`;
+});
+
+const _v3=new THREE.Vector3();
+let t=0;
+
+function updateLabels(){
+  labelEls.forEach(({el,group,offset})=>{
+    _v3.copy(group.position).add(offset);
+    pivot.localToWorld(_v3);
+    const projected=_v3.clone().project(camera);
+    if(projected.z>1){ el.style.display='none'; return; }
+    el.style.display='block';
+    const sx=(projected.x*0.5+0.5)*W;
+    const sy=(-projected.y*0.5+0.5)*H;
+    el.style.left=sx+'px';
+    el.style.top=sy+'px';
+  });
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  t+=0.004;
+  rotX+=(targetRotX-rotX)*0.06;
+  rotY+=(targetRotY-rotY)*0.06;
+  zoom+=(targetZoom-zoom)*0.06;
+  pivot.rotation.x=rotX;
+  pivot.rotation.y=rotY;
+  camera.position.z=zoom;
+  movieGroups.forEach((g,gi)=>{
+    g.rotation.y=t*(0.06+gi*0.008)*(gi%2===0?1:-1);
+  });
+  pl1.position.x=Math.sin(t*0.5)*15;
+  pl1.position.z=Math.cos(t*0.5)*15;
+  updateLabels();
+  renderer.render(scene,camera);
+}
+animate();
+</script>
+</body>
+</html>

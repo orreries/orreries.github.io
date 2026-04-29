@@ -19,7 +19,7 @@ function headerHTML() {
           <div class="header-title"><a href="${nesting}index.html" target="_top" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
           <nav>
             <ul>
-              <li><a href="${nesting}home.html">Home</a></li>
+              <li><a href="${nesting}home.html" target="_top">Home</a></li>
               <li class="dropdown">
                 <a href="#">Projects ▾</a>
                 <ul class="dropdown-menu">
@@ -29,6 +29,7 @@ function headerHTML() {
                 </ul>
               </li>
               <li><a href="${nesting}resume.html" target="_top">Resume</a></li>
+              <li><a href="${nesting}archive.html" target="_top">Archive</a></li>
             </ul>
           </nav>
         </div>
@@ -48,6 +49,13 @@ function headerHTML() {
             <li><a href="${nesting}projects/aave-nlp.html">AAVE NLP Analysis</a></li>
             <li><a href="${nesting}projects/qoz-geospatial.html">QOZ Efficacy</a></li>
             <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-title">Archive</div>
+          <ul>
+            <li><a href="${nesting}archive.html">Visualizations & Experiments</a></li>
           </ul>
         </div>
 
