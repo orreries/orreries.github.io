@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AAVE Density & Counts — Archive</title>
+  <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --background-color: #000000;
+      --text-color: #f1f1f1;
+      --link-color: #ea7af4;
+      --link-color-hover: #a611b1;
+      --font: Monaco, monospace;
+      --heading-font: 'Handjet', monospace;
+      --border: 2px solid #6a3eb7;
+      --color-text-primary: #f1f1f1;
+      --color-text-secondary: #b8a0d8;
+      --color-background-primary: #0d0820;
+      --color-background-secondary: rgba(106,62,183,0.18);
+      --color-border-primary: #6a3eb7;
+      --color-border-secondary: rgba(106,62,183,0.5);
+      --color-border-tertiary: rgba(106,62,183,0.3);
+    }
+    body {
+      background: var(--background-color);
+      background-image: url("https://orreries.github.io/images/bgstarz3.gif");
+      color: var(--text-color);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.5;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    h1 {
+      font-family: var(--heading-font);
+      font-size: 2.2em;
+      color: var(--link-color);
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      color: var(--color-text-secondary);
+      font-size: 0.75em;
+      font-style: italic;
+      margin-bottom: 24px;
+    }
+    .archive-notice {
+      display: inline-block;
+      font-size: 0.65em;
+      border: 1px solid #6a3eb7;
+      color: #ea7af4;
+      padding: 2px 8px;
+      margin-bottom: 12px;
+      font-family: Monaco, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      border: var(--border);
+      padding: 20px;
+      background: rgba(0,0,0,0.5);
+    }
+
+    /* ── DASHBOARD ── */
+    .dash { padding: 0.5rem 0; }
+    .dash .tab-row { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+    .dash .tab-btn { padding: 6px 14px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: 2px; background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: all .15s; font-family: Monaco, monospace; }
+    .dash .tab-btn.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); }
+    .dash .panel { display: none; }
+    .dash .panel.active { display: block; }
+    .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--color-text-secondary); margin-bottom: 12px; }
+    .tooltip { position: fixed; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 2px; padding: 8px 12px; font-size: 12px; pointer-events: none; opacity: 0; transition: opacity .15s; z-index: 999; max-width: 220px; font-family: Monaco, monospace; }
+    .tt-title { font-weight: 500; font-size: 13px; color: var(--color-text-primary); margin-bottom: 4px; }
+    .tt-row { color: var(--color-text-secondary); margin: 2px 0; }
+    .tt-row span { color: var(--color-text-primary); font-weight: 500; }
+    .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+    .chip { padding: 4px 10px; font-size: 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: 99px; cursor: pointer; background: transparent; color: var(--color-text-secondary); transition: all .15s; font-family: Monaco, monospace; }
+    .chip.on { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); }
+    #net text { font-family: Monaco, monospace; }
+
+    .legend { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 1rem; font-size: 12px; color: var(--color-text-secondary); }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="archive-notice">Archive · Visualization</div>
+    <h1>AAVE Density &amp; Counts</h1>
+    <p class="subtitle">African American Vernacular English · Comedy Scripts Analysis · Pratt Institute MS DAV</p>
+
+    <div class="dash">
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchDashTab(0)">Density &amp; counts</button>
+        <button class="tab-btn" onclick="switchDashTab(1)">Term co-occurrence</button>
+      </div>
+
+      <div class="panel active" id="dp0">
+        <p class="section-label">AAVE density per film — ranked by density score</p>
+        <div style="position:relative;width:100%;height:420px;">
+          <canvas id="densChart"></canvas>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-swatch" style="background:#7F77DD;"></span>Unique terms</div>
+          <div class="legend-item"><span class="legend-swatch" style="background:#1D9E75;"></span>AAVE term count</div>
+          <div class="legend-item"><span class="legend-swatch" style="background:#EF9F27;"></span>Density (×100)</div>
+        </div>
+      </div>
+
+      <div class="panel" id="dp1">
+        <p class="section-label">Terms shared across films — node size = how many films share that term</p>
+        <div class="filter-row" id="film-chips"></div>
+        <svg id="net" width="100%" viewBox="0 0 680 520" style="display:block;"></svg>
+        <p style="font-size:11px;color:var(--color-text-secondary);margin-top:8px;">Hover nodes to highlight connections · click films above to filter</p>
+      </div>
+    </div>
+
+    <div class="tooltip" id="tip"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script>
+  (function() {
+    const films = [
+      { title: "Tropic Thunder",        year: 2008, words: 21331, aave: 157, density: 0.74, unique: 36, terms: ["bank","beat","been","bet","cap","carry","cat","chill","din","done","drag","drop","dry","fierce","fire","g","heated","hit","if","link","mad","mans","mean","n","playin","plug","read","real","roll","school","serve","slumped","tea","thick","trip","vibe"] },
+      { title: "Next Friday",           year: 2000, words: 15665, aave: 111, density: 0.71, unique: 25, terms: ["bank","beat","been","boss","drop","extra","fire","ghetto","hit","ice","if","imma","laid","mad","mean","n","real","roll","school","snatched","thick","tight","trash","trip","wig"] },
+      { title: "Superbad",              year: 2007, words: 15665, aave: 111, density: 0.71, unique: 25, terms: ["bank","beat","been","boss","drop","extra","fire","ghetto","hit","ice","if","imma","laid","mad","mean","n","real","roll","school","snatched","thick","tight","trash","trip","wig"] },
+      { title: "Bridesmaids",           year: 2011, words: 15665, aave: 111, density: 0.71, unique: 25, terms: ["bank","beat","been","boss","drop","extra","fire","ghetto","hit","ice","if","imma","laid","mad","mean","n","real","roll","school","snatched","thick","tight","trash","trip","wig"] },
+      { title: "Hot Tub Time Machine",  year: 2010, words: 15665, aave: 111, density: 0.71, unique: 25, terms: ["bank","beat","been","boss","drop","extra","fire","ghetto","hit","ice","if","imma","laid","mad","mean","n","real","roll","school","snatched","thick","tight","trash","trip","wig"] },
+      { title: "Pineapple Express",     year: 2008, words: 21970, aave: 149, density: 0.68, unique: 25, terms: ["ate","beat","been","bet","chill","cop","done","dope","drag","fire","hit","if","kush","lit","mad","mans","mean","n","read","real","school","serve","slumped","tea","thick"] },
+      { title: "Harold & Kumar",        year: 2004, words: 25891, aave: 153, density: 0.59, unique: 28, terms: ["beat","beef","been","carry","chill","cop","dime","done","dope","drag","drop","dry","extra","filthy","fire","hit","if","laid","lit","mad","mans","mean","n","read","roll","school","thick","trip"] },
+      { title: "Scott Pilgrim",         year: 2010, words: 24627, aave: 121, density: 0.49, unique: 26, terms: ["beat","beef","been","bet","coin","done","drop","dry","fierce","fire","hit","homies","if","mad","mean","n","period","pressed","racks","read","real","school","shade","tea","trash","woke"] },
+      { title: "Ted",                   year: 2012, words: 26819, aave: 130, density: 0.48, unique: 29, terms: ["beat","been","bet","boss","carry","chill","cop","done","drag","drop","extra","g","hit","ice","if","lit","mans","mean","n","plug","read","real","roll","school","shook","tight","trash","wig","woke"] },
+      { title: "The Hangover",          year: 2009, words: 20568, aave:  86, density: 0.42, unique: 22, terms: ["bank","beat","been","bet","boss","coin","done","filthy","fire","g","hit","ice","if","laid","mad","mans","mean","pressed","real","roll","school","tight"] },
+    ];
+
+    const shortTitles = ["Tropic Thunder","Next Friday","Superbad","Bridesmaids","Hot Tub TM","Pineapple Exp.","Harold & Kumar","Scott Pilgrim","Ted","The Hangover"];
+
+    const ctx = document.getElementById('densChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: shortTitles,
+        datasets: [
+          { label: 'Unique terms',    data: films.map(f=>f.unique),                      backgroundColor: '#7F77DD', borderRadius: 3 },
+          { label: 'AAVE term count', data: films.map(f=>f.aave),                        backgroundColor: '#1D9E75', borderRadius: 3 },
+          { label: 'Density (×100)',  data: films.map(f=>+(f.density*100).toFixed(1)),   backgroundColor: '#EF9F27', borderRadius: 3 },
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: (c) => {
+            if (c.datasetIndex === 2) return ` Density: ${(c.parsed.y/100).toFixed(2)}%`;
+            return ` ${c.dataset.label}: ${c.parsed.y}`;
+          }}}
+        },
+        scales: {
+          x: { ticks: { color: '#b8a0d8', font: { size: 11, family: 'Monaco, monospace' }, maxRotation: 30, autoSkip: false }, grid: { display: false } },
+          y: { beginAtZero: true, grid: { color: 'rgba(106,62,183,0.2)' }, ticks: { color: '#b8a0d8', font: { size: 11, family: 'Monaco, monospace' } } }
+        }
+      }
+    });
+
+    // ── Network ──
+    const activeFilms = new Set(films.map(f=>f.title));
+    const tip = document.getElementById('tip');
+
+    function filmColor(i) {
+      const palette = ['#7F77DD','#1D9E75','#D85A30','#D4537E','#378ADD','#BA7517','#639922','#888780','#533AB7','#E24B4A'];
+      return palette[i % palette.length];
+    }
+
+    const chipRow = document.getElementById('film-chips');
+    films.forEach((f,i) => {
+      const b = document.createElement('button');
+      b.className = 'chip on';
+      b.textContent = shortTitles[i];
+      b.style.borderColor = filmColor(i);
+      b.style.background = filmColor(i)+'22';
+      b.onclick = () => {
+        if (activeFilms.has(f.title)) { activeFilms.delete(f.title); b.classList.remove('on'); b.style.background=''; }
+        else { activeFilms.add(f.title); b.classList.add('on'); b.style.background = filmColor(i)+'22'; }
+        drawNetwork();
+      };
+      chipRow.appendChild(b);
+    });
+
+    function drawNetwork() {
+      const svg = document.getElementById('net');
+      svg.innerHTML = '';
+      const W = 680, H = 520;
+      const activeList = films.filter(f => activeFilms.has(f.title));
+      if (!activeList.length) return;
+
+      const termFilms = {};
+      activeList.forEach((f) => {
+        f.terms.forEach(t => {
+          if (!termFilms[t]) termFilms[t] = [];
+          termFilms[t].push({ film: f, idx: films.indexOf(f) });
+        });
+      });
+
+      const sharedTerms = Object.entries(termFilms).filter(([,arr]) => arr.length >= 2);
+      if (!sharedTerms.length) {
+        svg.innerHTML = '<text x="340" y="260" text-anchor="middle" font-size="13" fill="#b8a0d8">No shared terms between selected films</text>';
+        return;
+      }
+
+      const filmNodes = {};
+      const cx = W/2, cy = H/2, rx = 230, ry = 190;
+      activeList.forEach((f, i) => {
+        const angle = (2*Math.PI * i / activeList.length) - Math.PI/2;
+        filmNodes[f.title] = { x: cx + rx*Math.cos(angle), y: cy + ry*Math.sin(angle) };
+      });
+
+      const termNodes = {};
+      sharedTerms.forEach(([term, fArr], i) => {
+        const angle = (2*Math.PI * i / sharedTerms.length) - Math.PI/2;
+        const r = 60 + (fArr.length / activeList.length) * 55;
+        termNodes[term] = { x: cx + r*Math.cos(angle), y: cy + r*Math.sin(angle), count: fArr.length, films: fArr };
+      });
+
+      for (let iter = 0; iter < 80; iter++) {
+        const ks = Object.keys(termNodes);
+        ks.forEach(a => {
+          ks.forEach(b => {
+            if (a === b) return;
+            const na = termNodes[a], nb = termNodes[b];
+            const dx = na.x - nb.x, dy = na.y - nb.y;
+            const d = Math.sqrt(dx*dx+dy*dy) || 1;
+            const minD = 28;
+            if (d < minD) {
+              const f = (minD - d) / d * 0.3;
+              na.x += dx*f; na.y += dy*f;
+              nb.x -= dx*f; nb.y -= dy*f;
+            }
+          });
+          const n = termNodes[a];
+          const dr = Math.sqrt((n.x-cx)**2+(n.y-cy)**2);
+          if (dr > 105) { n.x = cx + (n.x-cx)/dr*105; n.y = cy + (n.y-cy)/dr*105; }
+        });
+      }
+
+      const ns = document.createElementNS('http://www.w3.org/2000/svg','g');
+
+      sharedTerms.forEach(([term, fArr]) => {
+        const tn = termNodes[term];
+        fArr.forEach(({film}) => {
+          const fn = filmNodes[film.title];
+          const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+          line.setAttribute('x1', tn.x); line.setAttribute('y1', tn.y);
+          line.setAttribute('x2', fn.x); line.setAttribute('y2', fn.y);
+          line.setAttribute('stroke', filmColor(films.indexOf(film)));
+          line.setAttribute('stroke-width', '0.8');
+          line.setAttribute('opacity', '0.3');
+          line.dataset.term = term;
+          line.dataset.film = film.title;
+          ns.appendChild(line);
+        });
+      });
+
+      activeList.forEach(f => {
+        const fn = filmNodes[f.title];
+        const fi = films.indexOf(f);
+        const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+        g.setAttribute('cursor','pointer');
+        const circ = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        circ.setAttribute('cx', fn.x); circ.setAttribute('cy', fn.y); circ.setAttribute('r', 22);
+        circ.setAttribute('fill', filmColor(fi)+'33');
+        circ.setAttribute('stroke', filmColor(fi)); circ.setAttribute('stroke-width','1.5');
+        g.appendChild(circ);
+        const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+        label.setAttribute('x', fn.x); label.setAttribute('y', fn.y+1);
+        label.setAttribute('text-anchor','middle'); label.setAttribute('dominant-baseline','central');
+        label.setAttribute('font-size','9'); label.setAttribute('fill', filmColor(fi));
+        label.setAttribute('font-weight','500');
+        label.textContent = shortTitles[fi].length > 10 ? shortTitles[fi].slice(0,9)+'…' : shortTitles[fi];
+        g.appendChild(label);
+        g.addEventListener('mousemove', e => {
+          const sharedWithThis = sharedTerms.filter(([,arr]) => arr.some(x=>x.film.title===f.title));
+          tip.style.opacity = 1;
+          tip.style.left = (e.clientX+14)+'px'; tip.style.top = (e.clientY-10)+'px';
+          tip.innerHTML = `<div class="tt-title">${f.title} (${f.year})</div>
+            <div class="tt-row">Density: <span>${f.density.toFixed(2)}%</span></div>
+            <div class="tt-row">AAVE terms: <span>${f.aave}</span></div>
+            <div class="tt-row">Shared terms shown: <span>${sharedWithThis.length}</span></div>`;
+          ns.querySelectorAll('line').forEach(l => l.setAttribute('opacity', l.dataset.film===f.title ? '0.75' : '0.08'));
+          ns.querySelectorAll('circle.term-node').forEach(c => {
+            const highlight = sharedWithThis.some(([t]) => c.dataset.term===t);
+            c.setAttribute('opacity', highlight ? '1' : '0.25');
+          });
+        });
+        g.addEventListener('mouseleave', resetHighlight);
+        ns.appendChild(g);
+      });
+
+      sharedTerms.forEach(([term, fArr]) => {
+        const tn = termNodes[term];
+        const r = 5 + fArr.length * 2.5;
+        const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+        g.setAttribute('cursor','pointer');
+        const circ = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        circ.setAttribute('class','term-node');
+        circ.dataset.term = term;
+        circ.setAttribute('cx', tn.x); circ.setAttribute('cy', tn.y); circ.setAttribute('r', r);
+        circ.setAttribute('fill','rgba(13,8,32,0.9)');
+        circ.setAttribute('stroke','#6a3eb7'); circ.setAttribute('stroke-width','0.75');
+        g.appendChild(circ);
+        const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+        label.setAttribute('x', tn.x); label.setAttribute('y', tn.y+0.5);
+        label.setAttribute('text-anchor','middle'); label.setAttribute('dominant-baseline','central');
+        label.setAttribute('font-size','8.5'); label.setAttribute('fill','#f1f1f1');
+        label.textContent = term;
+        g.appendChild(label);
+        g.addEventListener('mousemove', e => {
+          tip.style.opacity = 1;
+          tip.style.left = (e.clientX+14)+'px'; tip.style.top = (e.clientY-10)+'px';
+          tip.innerHTML = `<div class="tt-title">"${term}"</div>
+            <div class="tt-row">Appears in <span>${fArr.length} films</span></div>
+            <div class="tt-row" style="margin-top:4px">${fArr.map(x=>`<span style="color:${filmColor(x.idx)}">${shortTitles[x.idx]}</span>`).join('<br>')}</div>`;
+          ns.querySelectorAll('line').forEach(l => l.setAttribute('opacity', l.dataset.term===term ? '0.75' : '0.06'));
+          ns.querySelectorAll('circle.term-node').forEach(c => c.setAttribute('opacity', c.dataset.term===term ? '1' : '0.2'));
+        });
+        g.addEventListener('mouseleave', resetHighlight);
+        ns.appendChild(g);
+      });
+
+      svg.appendChild(ns);
+
+      function resetHighlight() {
+        tip.style.opacity = 0;
+        ns.querySelectorAll('line').forEach(l => l.setAttribute('opacity','0.3'));
+        ns.querySelectorAll('circle.term-node').forEach(c => c.setAttribute('opacity','1'));
+      }
+    }
+
+    function switchDashTab(i) {
+      document.querySelectorAll('.dash .panel').forEach((p,j) => p.classList.toggle('active', i===j));
+      document.querySelectorAll('.dash .tab-btn').forEach((b,j) => b.classList.toggle('active', i===j));
+      if (i===1) drawNetwork();
+    }
+    window.switchDashTab = switchDashTab;
+  })();
+  </script>
+</body>
+</html>

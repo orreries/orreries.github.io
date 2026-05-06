@@ -210,6 +210,32 @@
 
               <a class="archive-source-link" href="./projects/aave-nlp.html">↗ Full project writeup</a>
             </div>
+
+            <!-- ENTRY 4: 3D Force Graph -->
+            <div class="archive-entry">
+              <div class="archive-entry-header">
+                <h2 class="archive-entry-title">AAVE 3D Force Graph</h2>
+                <div class="archive-entry-meta">
+                  <span class="archive-tag">3D Force Graph</span>
+                  <span class="archive-tag">NLP</span>
+                  <span class="archive-year">2024</span>
+                </div>
+              </div>
+              <p class="archive-entry-desc">3D force-directed graph mapping films, AAVE terms, and tweet clusters as interconnected nodes. Pink nodes are films sized by AAVE density; teal nodes are the top shared terms; orange nodes are the closest tweet clusters by cosine similarity. Link brightness and particle flow encode similarity strength — Harold & Kumar and The Hangover visibly dim at the edges. Filter by layer to isolate co-occurrence patterns between films.</p>
+              <div id="g3-wrap" style="position:relative;width:100%;height:520px;background:#050008;border-radius:2px;overflow:hidden;border:1px solid rgba(106,62,183,0.3);">
+                <div id="g3-legend" style="position:absolute;bottom:14px;left:14px;font-family:Monaco,monospace;font-size:10px;color:#b8a0d8;line-height:2;pointer-events:none;z-index:10;">
+                  <div><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#ea7af4;margin-right:5px;vertical-align:middle"></span>Film (size = AAVE density)</div>
+                  <div><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#7ecfc1;margin-right:5px;vertical-align:middle"></span>AAVE term</div>
+                  <div><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#ffb49a;margin-right:5px;vertical-align:middle"></span>Tweet cluster</div>
+                  <div style="margin-top:4px;color:#444;border-top:1px solid #222;padding-top:4px">link brightness = cosine sim</div>
+                </div>
+                <div id="g3-controls" style="position:absolute;top:12px;right:12px;font-family:Monaco,monospace;font-size:10px;color:#6a3eb7;text-align:right;pointer-events:none;z-index:10;line-height:1.8;">drag · scroll to zoom<br>click node for detail</div>
+                <div id="g3-filter" style="position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;max-width:320px;z-index:10;"></div>
+                <div id="g3-tooltip" style="position:absolute;pointer-events:none;background:rgba(10,0,20,0.92);border:1px solid #6a3eb7;border-radius:4px;padding:8px 12px;font-family:Monaco,monospace;font-size:11px;color:#f1f1f1;max-width:220px;z-index:100;display:none;line-height:1.6;"></div>
+              </div>
+              <a class="archive-source-link" href="./projects/aave-nlp.html">↗ Full project writeup</a>
+              <hr class="archive-divider" />
+            </div>
           </div>
         </section>
       </main>
@@ -218,146 +244,157 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script>
     (function(){
-      const MOVIES=[
-        {id:0,title:"Tropic Thunder", year:2008,totalWords:21331,aaveCount:157,density:0.74,unique:36, terms:[["if",37],["real",19],["been",19],["fire",10],["mean",10],["bank",4],["beat",6],["bet",5],["cap",3],["carry",4],["cat",2],["chill",4],["din",1],["done",5],["drag",3],["drop",5],["dry",2],["fierce",3],["g",4],["heated",2],["hit",7],["link",2],["mad",5],["mans",4],["n",6],["playin",2],["plug",3],["read",3],["roll",4],["school",6],["serve",2],["slumped",1],["tea",3],["thick",2],["trip",3],["vibe",2]]},
-        {id:1,title:"Next Friday",    year:2000,totalWords:15665,aaveCount:111,density:0.71,unique:25, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["bank",3],["beat",5],["boss",4],["drop",4],["extra",2],["fire",4],["ghetto",3],["ice",3],["laid",2],["mad",4],["mean",5],["n",3],["roll",4],["school",5],["snatched",1],["thick",2],["tight",3],["trash",2],["trip",2],["wig",1]]},
-        {id:2,title:"Superbad",       year:2007,totalWords:15665,aaveCount:111,density:0.71,unique:25, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["bank",3],["beat",5],["boss",4],["drop",4],["extra",2],["fire",4],["ghetto",3],["ice",3],["laid",2],["mad",4],["mean",5],["n",3],["roll",4],["school",5],["snatched",1],["thick",2],["tight",3],["trash",2],["trip",2],["wig",1]]},
-        {id:3,title:"Bridesmaids",    year:2011,totalWords:15665,aaveCount:111,density:0.71,unique:25, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["bank",3],["beat",5],["boss",4],["drop",4],["extra",2],["fire",4],["ghetto",3],["ice",3],["laid",2],["mad",4],["mean",5],["n",3],["roll",4],["school",5],["snatched",1],["thick",2],["tight",3],["trash",2],["trip",2],["wig",1]]},
-        {id:4,title:"Hot Tub TM",     year:2010,totalWords:15665,aaveCount:111,density:0.71,unique:25, terms:[["if",25],["imma",24],["hit",13],["been",9],["real",6],["bank",3],["beat",5],["boss",4],["drop",4],["extra",2],["fire",4],["ghetto",3],["ice",3],["laid",2],["mad",4],["mean",5],["n",3],["roll",4],["school",5],["snatched",1],["thick",2],["tight",3],["trash",2],["trip",2],["wig",1]]},
-        {id:5,title:"Pineapple Exp.", year:2008,totalWords:21970,aaveCount:149,density:0.68,unique:25, terms:[["if",41],["cop",20],["been",18],["hit",14],["school",9],["ate",2],["beat",5],["bet",4],["chill",5],["done",4],["dope",3],["drag",3],["fire",5],["kush",2],["lit",3],["mad",6],["mans",3],["mean",5],["n",4],["read",2],["real",5],["serve",2],["slumped",1],["tea",3],["thick",2]]},
-        {id:6,title:"Harold & Kumar", year:2004,totalWords:25891,aaveCount:153,density:0.59,unique:28, terms:[["if",43],["been",31],["hit",15],["cop",13],["school",9],["beat",5],["beef",3],["carry",3],["chill",4],["dime",2],["done",5],["drag",3],["drop",4],["dry",2],["extra",2],["filthy",2],["fire",4],["laid",2],["lit",3],["mad",5],["mans",4],["mean",5],["n",3],["read",2],["roll",3],["thick",2],["trip",2],["vibe",1]]},
-        {id:7,title:"Scott Pilgrim",  year:2010,totalWords:24627,aaveCount:121,density:0.49,unique:26, terms:[["if",46],["been",16],["school",12],["mean",8],["hit",5],["beat",4],["beef",3],["bet",3],["coin",2],["done",4],["drop",4],["dry",2],["fierce",2],["fire",3],["homies",2],["mad",4],["n",3],["period",1],["pressed",2],["racks",1],["read",2],["real",3],["shade",1],["tea",2],["trash",2],["woke",1]]},
-        {id:8,title:"Ted",            year:2012,totalWords:26819,aaveCount:130,density:0.48,unique:29, terms:[["if",41],["been",23],["mean",8],["hit",8],["beat",4],["boss",4],["carry",3],["chill",5],["cop",4],["done",5],["drag",3],["drop",4],["extra",2],["g",3],["ice",2],["lit",3],["mans",4],["n",4],["plug",2],["read",3],["real",5],["roll",3],["school",7],["shook",1],["tight",3],["trash",2],["wig",1],["woke",2],["bet",2]]},
-        {id:9,title:"The Hangover",   year:2009,totalWords:20568,aaveCount:86, density:0.42,unique:22, terms:[["if",29],["been",15],["real",6],["tight",5],["beat",4],["bank",3],["bet",3],["boss",4],["coin",2],["done",4],["filthy",2],["fire",3],["g",2],["hit",5],["ice",3],["laid",2],["mad",4],["mans",3],["mean",4],["pressed",2],["roll",3],["school",4]]},
+      const MOVIE_COLOR='#ea7af4', TERM_COLOR='#7ecfc1', TWEET_COLOR='#ffb49a';
+      const movies=[
+        {id:'tropic_thunder',label:'Tropic Thunder',density:0.74,cosine:0.1872,unique:36,year:2008},
+        {id:'next_friday',label:'Next Friday',density:0.71,cosine:0.2208,unique:25,year:2000},
+        {id:'superbad',label:'Superbad',density:0.71,cosine:0.2013,unique:25,year:2007},
+        {id:'bridesmaids',label:'Bridesmaids',density:0.71,cosine:0.2217,unique:25,year:2011},
+        {id:'httm',label:'Hot Tub TM',density:0.71,cosine:0.2040,unique:25,year:2010},
+        {id:'pineapple',label:'Pineapple Express',density:0.68,cosine:0.1743,unique:25,year:2008},
+        {id:'harold_kumar',label:'Harold & Kumar',density:0.59,cosine:0.0892,unique:28,year:2004},
+        {id:'scott_pilgrim',label:'Scott Pilgrim',density:0.49,cosine:0.1146,unique:26,year:2010},
+        {id:'ted',label:'Ted',density:0.48,cosine:0.1471,unique:29,year:2012},
+        {id:'hangover',label:'The Hangover',density:0.42,cosine:0.2339,unique:22,year:2009},
       ];
-      let cur=MOVIES[0], view='bubble', sim=null;
-      const pink='#ea7af4', pinkDim='#a611b1', H=420;
-      const W=()=>document.getElementById('aave-canvas').clientWidth||700;
-
-      function renderBtns(){
-        document.getElementById('movie-btns').innerHTML=MOVIES.map(m=>
-          `<button class="movie-btn${m.id===cur.id?' active':''}" onclick="pickMovie(${m.id})">${m.title}</button>`
-        ).join('');
-      }
-      window.pickMovie=function(id){cur=MOVIES[id];renderBtns();renderStats();renderView();};
-      window.setView=function(v){
-        view=v;
-        document.querySelectorAll('.view-btn').forEach((b,i)=>b.classList.toggle('active',['bubble','cloud','bar'][i]===v));
-        renderView();
+      const topTerms=[
+        {id:'t_if',label:'"if"',freq:37},{id:'t_been',label:'"been"',freq:25},
+        {id:'t_hit',label:'"hit"',freq:14},{id:'t_real',label:'"real"',freq:13},
+        {id:'t_fire',label:'"fire"',freq:10},{id:'t_cop',label:'"cop"',freq:9},
+        {id:'t_mean',label:'"mean"',freq:9},{id:'t_school',label:'"school"',freq:9},
+        {id:'t_mad',label:'"mad"',freq:8},{id:'t_imma',label:'"imma"',freq:8},
+        {id:'t_drop',label:'"drop"',freq:7},{id:'t_boss',label:'"boss"',freq:5},
+      ];
+      const tweetClusters=[
+        {id:'tw_oscars',label:'#OscarsSoWhite',topSim:0.36},
+        {id:'tw_thanksgiving',label:'#ThanksgivingClapback',topSim:0.36},
+        {id:'tw_friday',label:'Black Friday tweets',topSim:0.35},
+        {id:'tw_family',label:'Family clapbacks',topSim:0.34},
+      ];
+      const movieTermLinks={
+        tropic_thunder:['t_if','t_real','t_fire','t_been','t_mean','t_hit'],
+        next_friday:['t_if','t_imma','t_hit','t_been','t_real'],
+        superbad:['t_if','t_imma','t_hit','t_been','t_real'],
+        bridesmaids:['t_if','t_imma','t_hit','t_been','t_real'],
+        httm:['t_if','t_imma','t_hit','t_been','t_real'],
+        pineapple:['t_if','t_cop','t_been','t_hit','t_school'],
+        harold_kumar:['t_if','t_been','t_hit','t_cop','t_school'],
+        scott_pilgrim:['t_if','t_been','t_school','t_mean','t_hit'],
+        ted:['t_if','t_been','t_mean','t_hit','t_boss'],
+        hangover:['t_if','t_been','t_real','t_mad'],
       };
-      function renderStats(){
-        const m=cur;
-        document.getElementById('stats-row').innerHTML=
-          `<div class="stat-pill">total words: <span>${m.totalWords.toLocaleString()}</span></div>`+
-          `<div class="stat-pill">aave terms: <span>${m.aaveCount}</span></div>`+
-          `<div class="stat-pill">density: <span>${m.density.toFixed(2)}%</span></div>`+
-          `<div class="stat-pill">unique: <span>${m.unique}</span></div>`;
-      }
-      function renderView(){
-        if(sim){sim.stop();sim=null;}
-        if(view==='bubble') renderBubble();
-        else if(view==='cloud') renderCloud();
-        else renderBar();
-      }
-      function getSvg(){
-        const svg=d3.select('#viz-svg');
-        svg.selectAll('*').remove();
-        svg.attr('viewBox',`0 0 ${W()} ${H}`);
-        return svg;
-      }
-      function showTip(event,html){
-        const t=document.getElementById('d3-tooltip');
-        t.innerHTML=html; t.style.display='block';
-        const box=document.getElementById('aave-canvas').getBoundingClientRect();
-        let x=event.clientX-box.left+12, y=event.clientY-box.top+12;
-        if(x+170>W()) x-=180; if(y+80>H) y-=80;
-        t.style.left=x+'px'; t.style.top=y+'px';
-      }
-      function hideTip(){document.getElementById('d3-tooltip').style.display='none';}
+      const movieTweetLinks={
+        next_friday:{cluster:'tw_friday',sim:0.2208},
+        superbad:{cluster:'tw_oscars',sim:0.2013},
+        bridesmaids:{cluster:'tw_oscars',sim:0.2217},
+        hangover:{cluster:'tw_thanksgiving',sim:0.2339},
+        httm:{cluster:'tw_family',sim:0.2040},
+        harold_kumar:{cluster:'tw_oscars',sim:0.0892},
+        scott_pilgrim:{cluster:'tw_thanksgiving',sim:0.1146},
+        pineapple:{cluster:'tw_oscars',sim:0.1743},
+        ted:{cluster:'tw_oscars',sim:0.1471},
+        tropic_thunder:{cluster:'tw_oscars',sim:0.1872},
+      };
 
-      function renderBubble(){
-        const svg=getSvg(),w=W(),terms=cur.terms;
-        const maxCount=d3.max(terms,d=>d[1]);
-        const rScale=d3.scaleSqrt().domain([1,maxCount]).range([10,52]);
-        const cScale=d3.scaleSequential().domain([1,maxCount]).interpolator(t=>d3.interpolateRgb('#2d1060','#ea7af4')(t));
-        const nodes=terms.map(([word,count])=>({word,count,r:rScale(count)}));
-        sim=d3.forceSimulation(nodes)
-          .force('charge',d3.forceManyBody().strength(5))
-          .force('center',d3.forceCenter(w/2,H/2))
-          .force('collision',d3.forceCollide(d=>d.r+3))
-          .force('x',d3.forceX(w/2).strength(0.06))
-          .force('y',d3.forceY(H/2).strength(0.08));
-        const g=svg.append('g');
-        const node=g.selectAll('g.node').data(nodes).join('g').attr('class','node').style('cursor','pointer');
-        node.append('circle').attr('r',d=>d.r).attr('fill',d=>cScale(d.count))
-          .attr('stroke',d=>d.count===maxCount?pink:'rgba(234,122,244,0.3)').attr('stroke-width',d=>d.count===maxCount?2:1);
-        node.append('text').attr('text-anchor','middle').attr('dominant-baseline','central')
-          .attr('font-family','Monaco,monospace').attr('font-size',d=>Math.min(d.r*0.55,14)+'px')
-          .attr('fill',d=>d.r<18?'rgba(241,241,241,0.7)':'#f1f1f1').attr('pointer-events','none')
-          .text(d=>d.r<12?'':d.word);
-        node.on('mousemove',(event,d)=>showTip(event,`<strong>${d.word}</strong><br>count: ${d.count}<br>rank: #${cur.terms.findIndex(t=>t[0]===d.word)+1}`))
-            .on('mouseleave',hideTip);
-        sim.on('tick',()=>node.attr('transform',d=>{
-          d.x=Math.max(d.r+2,Math.min(w-d.r-2,d.x));
-          d.y=Math.max(d.r+2,Math.min(H-d.r-2,d.y));
-          return `translate(${d.x},${d.y})`;
-        }));
+      function buildGraph(filter){
+        let nodes=[], links=[];
+        const addTerms=filter==='all'||filter==='term';
+        const addTweets=filter==='all'||filter==='tweet';
+        movies.forEach(m=>nodes.push({id:m.id,label:m.label,type:'movie',val:4+m.density*8,density:m.density,cosine:m.cosine,unique:m.unique,year:m.year}));
+        if(addTerms){
+          topTerms.forEach(t=>nodes.push({id:t.id,label:t.label,type:'term',val:2+t.freq*0.3,freq:t.freq}));
+          movies.forEach(m=>(movieTermLinks[m.id]||[]).forEach(tid=>links.push({source:m.id,target:tid,type:'term',strength:0.4})));
+        }
+        if(addTweets){
+          tweetClusters.forEach(tc=>nodes.push({id:tc.id,label:tc.label,type:'tweet',val:3+tc.topSim*12,topSim:tc.topSim}));
+          movies.forEach(m=>{const l=movieTweetLinks[m.id];if(l)links.push({source:m.id,target:l.cluster,type:'tweet',sim:l.sim,strength:l.sim*3});});
+        }
+        if(filter==='movie'){
+          movies.forEach((m1,i)=>movies.forEach((m2,j)=>{
+            if(j<=i)return;
+            const shared=(movieTermLinks[m1.id]||[]).filter(t=>(movieTermLinks[m2.id]||[]).includes(t));
+            if(shared.length>=3)links.push({source:m1.id,target:m2.id,type:'shared',shared:shared.length});
+          }));
+        }
+        return {nodes,links};
       }
 
-      function renderCloud(){
-        const svg=getSvg(),w=W(),terms=cur.terms;
-        const maxCount=d3.max(terms,d=>d[1]);
-        const fsScale=d3.scaleSqrt().domain([1,maxCount]).range([11,52]);
-        const cScale=d3.scaleSequential().domain([1,maxCount]).interpolator(t=>d3.interpolateRgb(pinkDim,pink)(t));
-        const placed=[],cx=w/2,cy=H/2,sorted=[...terms].sort((a,b)=>b[1]-a[1]);
-        svg.append('rect').attr('width',w).attr('height',H).attr('fill','transparent');
-        let angle=0;
-        const spiral=i=>{const r=2.5*i;angle+=0.35;return[cx+r*Math.cos(angle),cy+r*Math.sin(angle)];};
-        const g=svg.append('g');
-        sorted.forEach(([word,count],i)=>{
-          const fs=fsScale(count),charW=fs*0.62,tw=word.length*charW,th=fs*1.2;
-          let [px,py]=i===0?[cx,cy]:spiral(i*6),tries=0;
-          while(tries<200){
-            let ok=true;
-            for(const p of placed) if(Math.abs(px-p.x)<(tw+p.tw)/2+3&&Math.abs(py-p.y)<(th+p.th)/2+3){ok=false;break;}
-            if(ok&&px>tw/2+4&&px<w-tw/2-4&&py>th/2+4&&py<H-th/2-4) break;
-            const [nx,ny]=spiral(i*6+tries);px=nx;py=ny;tries++;
-          }
-          placed.push({x:px,y:py,tw,th});
-          g.append('text').attr('x',px).attr('y',py).attr('text-anchor','middle').attr('dominant-baseline','central')
-            .attr('font-family','Monaco,monospace').attr('font-size',fs+'px').attr('fill',cScale(count))
-            .attr('opacity',0.9).style('cursor','pointer').text(word)
-            .on('mousemove',event=>showTip(event,`<strong>${word}</strong><br>count: ${count}`))
-            .on('mouseleave',hideTip);
+      function initGraph(){
+        const container=document.getElementById('g3-wrap');
+        const w=container.getBoundingClientRect().width||800;
+
+        const filterBar=document.getElementById('g3-filter');
+        const filterDefs=[{f:'all',label:'all'},{f:'movie',label:'movies'},{f:'term',label:'top terms'},{f:'tweet',label:'tweet clusters'}];
+        filterDefs.forEach(({f,label})=>{
+          const btn=document.createElement('button');
+          btn.textContent=label;
+          btn.style.cssText='background:transparent;border:1px solid rgba(106,62,183,0.5);border-radius:2px;padding:4px 10px;font-family:Monaco,monospace;font-size:10px;color:rgba(241,241,241,0.6);cursor:pointer;transition:all 0.15s;white-space:nowrap;';
+          if(f==='all'){btn.style.background='rgba(106,62,183,0.25)';btn.style.borderColor='#6a3eb7';btn.style.color='#ea7af4';}
+          btn.addEventListener('click',()=>{
+            document.querySelectorAll('#g3-filter button').forEach(b=>{b.style.background='transparent';b.style.borderColor='rgba(106,62,183,0.5)';b.style.color='rgba(241,241,241,0.6)';});
+            btn.style.background='rgba(106,62,183,0.25)';btn.style.borderColor='#6a3eb7';btn.style.color='#ea7af4';
+            Graph.graphData(buildGraph(f));
+          });
+          filterBar.appendChild(btn);
         });
+
+        const Graph=ForceGraph3D()(container)
+          .width(w).height(520)
+          .backgroundColor('#050008')
+          .showNavInfo(false)
+          .graphData(buildGraph('all'))
+          .nodeLabel(()=>'')
+          .nodeVal(n=>n.val)
+          .nodeColor(n=>n.type==='movie'?MOVIE_COLOR:n.type==='term'?TERM_COLOR:TWEET_COLOR)
+          .nodeOpacity(0.95)
+          .nodeResolution(16)
+          .linkColor(l=>{
+            if(l.type==='tweet'){const a=Math.round(40+(l.sim||0.1)*200);return `rgba(255,180,154,${(a/255).toFixed(2)})`;}
+            if(l.type==='term') return 'rgba(126,207,193,0.22)';
+            if(l.type==='shared') return `rgba(106,62,183,${Math.min(0.8,(l.shared||1)*0.12)})`;
+            return 'rgba(106,62,183,0.15)';
+          })
+          .linkWidth(l=>l.type==='tweet'?1.5+(l.sim||0)*4:l.type==='shared'?1:0.5)
+          .linkOpacity(0.8)
+          .linkDirectionalParticles(l=>l.type==='tweet'?3:l.type==='term'?1:0)
+          .linkDirectionalParticleWidth(l=>l.type==='tweet'?1.5:0.8)
+          .linkDirectionalParticleColor(l=>l.type==='tweet'?'#ffb49a':'#7ecfc1')
+          .linkDirectionalParticleSpeed(l=>l.type==='tweet'?0.005+(l.sim||0)*0.01:0.004)
+          .onNodeHover(node=>{
+            const tt=document.getElementById('g3-tooltip');
+            if(!node){tt.style.display='none';return;}
+            let html=`<div style="color:#ea7af4;font-size:12px;font-weight:bold;margin-bottom:4px">${node.label}</div>`;
+            if(node.type==='movie'){
+              html+=`<div style="color:#b8a0d8">Year: <span style="color:#f1f1f1">${node.year}</span></div>`;
+              html+=`<div style="color:#b8a0d8">AAVE density: <span style="color:#f1f1f1">${node.density.toFixed(2)}%</span></div>`;
+              html+=`<div style="color:#b8a0d8">Cosine sim: <span style="color:#f1f1f1">${node.cosine.toFixed(4)}</span></div>`;
+              html+=`<div style="color:#b8a0d8">Unique terms: <span style="color:#f1f1f1">${node.unique}</span></div>`;
+            } else if(node.type==='term'){
+              html+=`<div style="color:#b8a0d8">Avg frequency: <span style="color:#f1f1f1">${node.freq}</span></div>`;
+            } else {
+              html+=`<div style="color:#b8a0d8">Top cosine sim: <span style="color:#f1f1f1">${node.topSim.toFixed(4)}</span></div>`;
+            }
+            tt.innerHTML=html; tt.style.display='block';
+          })
+          .onNodeClick(()=>{ window.location.href='./projects/aave-nlp.html'; });
+
+        container.addEventListener('mousemove',e=>{
+          const tt=document.getElementById('g3-tooltip');
+          if(tt.style.display==='block'){tt.style.left=(e.offsetX+14)+'px';tt.style.top=(e.offsetY+14)+'px';}
+        });
+
+        Graph.d3Force('charge').strength(-120);
+        Graph.d3Force('link').distance(l=>l.type==='tweet'?80:l.type==='term'?50:40);
+        setTimeout(()=>Graph.cameraPosition({x:0,y:0,z:320},{x:0,y:0,z:0},2000),100);
+
+        new ResizeObserver(()=>Graph.width(container.getBoundingClientRect().width)).observe(container);
       }
 
-      function renderBar(){
-        const svg=getSvg(),w=W();
-        const terms=[...cur.terms].sort((a,b)=>b[1]-a[1]).slice(0,20);
-        const margin={top:14,right:20,bottom:36,left:64};
-        const iw=w-margin.left-margin.right,ih=H-margin.top-margin.bottom;
-        const x=d3.scaleLinear().domain([0,d3.max(terms,d=>d[1])]).range([0,iw]);
-        const y=d3.scaleBand().domain(terms.map(d=>d[0])).range([0,ih]).padding(0.25);
-        const g=svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
-        const cScale=d3.scaleSequential().domain([0,terms.length]).interpolator(t=>d3.interpolateRgb('#2d1060','#ea7af4')(t));
-        g.selectAll('rect').data(terms).join('rect').attr('y',d=>y(d[0])).attr('height',y.bandwidth())
-          .attr('x',0).attr('width',d=>x(d[1])).attr('fill',(d,i)=>cScale(i)).attr('rx',1).style('cursor','pointer')
-          .on('mousemove',(event,d)=>showTip(event,`<strong>${d[0]}</strong><br>count: ${d[1]}`)).on('mouseleave',hideTip);
-        g.selectAll('text.val').data(terms).join('text').attr('class','val').attr('x',d=>x(d[1])+5)
-          .attr('y',d=>y(d[0])+y.bandwidth()/2).attr('dominant-baseline','central')
-          .attr('font-family','Monaco,monospace').attr('font-size','11px').attr('fill','rgba(241,241,241,0.6)').text(d=>d[1]);
-        const yAxis=g.append('g').call(d3.axisLeft(y).tickSize(0).tickPadding(8));
-        yAxis.select('.domain').remove();
-        yAxis.selectAll('text').attr('font-family','Monaco,monospace').attr('font-size','11px').attr('fill','rgba(241,241,241,0.75)');
-        const xAxis=g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(5).tickSize(-ih));
-        xAxis.select('.domain').remove();
-        xAxis.selectAll('.tick line').attr('stroke','rgba(106,62,183,0.25)').attr('stroke-dasharray','2,2');
-        xAxis.selectAll('text').attr('font-family','Monaco,monospace').attr('font-size','11px').attr('fill','rgba(241,241,241,0.5)');
+      if(document.readyState==='complete'){
+        initGraph();
+      } else {
+        window.addEventListener('load', initGraph);
       }
-
-      renderBtns(); renderStats(); renderView();
-      window.addEventListener('resize',()=>{if(sim)sim.stop();renderView();});
     })();
     </script>
 
@@ -564,5 +601,153 @@
       };
     })();
     </script>
+    <script src="https://unpkg.com/3d-force-graph@1.70.10/dist/3d-force-graph.min.js"></script>
+    <script>
+    (function(){
+      const MOVIE_COLOR='#ea7af4', TERM_COLOR='#7ecfc1', TWEET_COLOR='#ffb49a';
+      const movies=[
+        {id:'tropic_thunder',label:'Tropic Thunder',density:0.74,cosine:0.1872,unique:36,year:2008},
+        {id:'next_friday',label:'Next Friday',density:0.71,cosine:0.2208,unique:25,year:2000},
+        {id:'superbad',label:'Superbad',density:0.71,cosine:0.2013,unique:25,year:2007},
+        {id:'bridesmaids',label:'Bridesmaids',density:0.71,cosine:0.2217,unique:25,year:2011},
+        {id:'httm',label:'Hot Tub TM',density:0.71,cosine:0.2040,unique:25,year:2010},
+        {id:'pineapple',label:'Pineapple Express',density:0.68,cosine:0.1743,unique:25,year:2008},
+        {id:'harold_kumar',label:'Harold & Kumar',density:0.59,cosine:0.0892,unique:28,year:2004},
+        {id:'scott_pilgrim',label:'Scott Pilgrim',density:0.49,cosine:0.1146,unique:26,year:2010},
+        {id:'ted',label:'Ted',density:0.48,cosine:0.1471,unique:29,year:2012},
+        {id:'hangover',label:'The Hangover',density:0.42,cosine:0.2339,unique:22,year:2009},
+      ];
+      const topTerms=[
+        {id:'t_if',label:'"if"',freq:37},{id:'t_been',label:'"been"',freq:25},
+        {id:'t_hit',label:'"hit"',freq:14},{id:'t_real',label:'"real"',freq:13},
+        {id:'t_fire',label:'"fire"',freq:10},{id:'t_cop',label:'"cop"',freq:9},
+        {id:'t_mean',label:'"mean"',freq:9},{id:'t_school',label:'"school"',freq:9},
+        {id:'t_mad',label:'"mad"',freq:8},{id:'t_imma',label:'"imma"',freq:8},
+        {id:'t_drop',label:'"drop"',freq:7},{id:'t_boss',label:'"boss"',freq:5},
+      ];
+      const tweetClusters=[
+        {id:'tw_oscars',label:'#OscarsSoWhite',topSim:0.36},
+        {id:'tw_thanksgiving',label:'#ThanksgivingClapback',topSim:0.36},
+        {id:'tw_friday',label:'Black Friday tweets',topSim:0.35},
+        {id:'tw_family',label:'Family clapbacks',topSim:0.34},
+      ];
+      const movieTermLinks={
+        tropic_thunder:['t_if','t_real','t_fire','t_been','t_mean','t_hit'],
+        next_friday:['t_if','t_imma','t_hit','t_been','t_real'],
+        superbad:['t_if','t_imma','t_hit','t_been','t_real'],
+        bridesmaids:['t_if','t_imma','t_hit','t_been','t_real'],
+        httm:['t_if','t_imma','t_hit','t_been','t_real'],
+        pineapple:['t_if','t_cop','t_been','t_hit','t_school'],
+        harold_kumar:['t_if','t_been','t_hit','t_cop','t_school'],
+        scott_pilgrim:['t_if','t_been','t_school','t_mean','t_hit'],
+        ted:['t_if','t_been','t_mean','t_hit','t_boss'],
+        hangover:['t_if','t_been','t_real','t_mad'],
+      };
+      const movieTweetLinks={
+        next_friday:{cluster:'tw_friday',sim:0.2208},
+        superbad:{cluster:'tw_oscars',sim:0.2013},
+        bridesmaids:{cluster:'tw_oscars',sim:0.2217},
+        hangover:{cluster:'tw_thanksgiving',sim:0.2339},
+        httm:{cluster:'tw_family',sim:0.2040},
+        harold_kumar:{cluster:'tw_oscars',sim:0.0892},
+        scott_pilgrim:{cluster:'tw_thanksgiving',sim:0.1146},
+        pineapple:{cluster:'tw_oscars',sim:0.1743},
+        ted:{cluster:'tw_oscars',sim:0.1471},
+        tropic_thunder:{cluster:'tw_oscars',sim:0.1872},
+      };
+
+      function buildGraph(filter){
+        let nodes=[], links=[];
+        const addMovies=true;
+        const addTerms=filter==='all'||filter==='term';
+        const addTweets=filter==='all'||filter==='tweet';
+        if(addMovies) movies.forEach(m=>nodes.push({id:m.id,label:m.label,type:'movie',val:4+m.density*8,density:m.density,cosine:m.cosine,unique:m.unique,year:m.year}));
+        if(addTerms){
+          topTerms.forEach(t=>nodes.push({id:t.id,label:t.label,type:'term',val:2+t.freq*0.3,freq:t.freq}));
+          movies.forEach(m=>(movieTermLinks[m.id]||[]).forEach(tid=>links.push({source:m.id,target:tid,type:'term',strength:0.4})));
+        }
+        if(addTweets){
+          tweetClusters.forEach(tc=>nodes.push({id:tc.id,label:tc.label,type:'tweet',val:3+tc.topSim*12,topSim:tc.topSim}));
+          movies.forEach(m=>{const l=movieTweetLinks[m.id]; if(l) links.push({source:m.id,target:l.cluster,type:'tweet',sim:l.sim,strength:l.sim*3});});
+        }
+        if(filter==='movie'){
+          movies.forEach((m1,i)=>movies.forEach((m2,j)=>{
+            if(j<=i) return;
+            const shared=(movieTermLinks[m1.id]||[]).filter(t=>(movieTermLinks[m2.id]||[]).includes(t));
+            if(shared.length>=3) links.push({source:m1.id,target:m2.id,type:'shared',shared:shared.length});
+          }));
+        }
+        return {nodes,links};
+      }
+
+      const filterBar=document.getElementById('g3-filter');
+      const filterDefs=[{f:'all',label:'all'},{f:'movie',label:'movies'},{f:'term',label:'top terms'},{f:'tweet',label:'tweet clusters'}];
+      filterDefs.forEach(({f,label})=>{
+        const btn=document.createElement('button');
+        btn.textContent=label; btn.dataset.f=f;
+        btn.style.cssText='background:transparent;border:1px solid rgba(106,62,183,0.5);border-radius:2px;padding:4px 10px;font-family:Monaco,monospace;font-size:10px;color:rgba(241,241,241,0.6);cursor:pointer;transition:all 0.15s;white-space:nowrap;';
+        if(f==='all'){btn.style.background='rgba(106,62,183,0.25)';btn.style.borderColor='#6a3eb7';btn.style.color='#ea7af4';}
+        btn.addEventListener('click',()=>{
+          document.querySelectorAll('#g3-filter button').forEach(b=>{b.style.background='transparent';b.style.borderColor='rgba(106,62,183,0.5)';b.style.color='rgba(241,241,241,0.6)';});
+          btn.style.background='rgba(106,62,183,0.25)';btn.style.borderColor='#6a3eb7';btn.style.color='#ea7af4';
+          Graph.graphData(buildGraph(f));
+        });
+        filterBar.appendChild(btn);
+      });
+
+      const container=document.getElementById('g3-wrap');
+      const Graph=ForceGraph3D()(container)
+        .width(container.clientWidth).height(520)
+        .backgroundColor('#050008')
+        .showNavInfo(false)
+        .graphData(buildGraph('all'))
+        .nodeLabel(()=>'')
+        .nodeVal(n=>n.val)
+        .nodeColor(n=>n.type==='movie'?MOVIE_COLOR:n.type==='term'?TERM_COLOR:TWEET_COLOR)
+        .nodeOpacity(0.95)
+        .nodeResolution(16)
+        .linkColor(l=>{
+          if(l.type==='tweet'){const a=Math.round(40+(l.sim||0.1)*200);return `rgba(255,180,154,${(a/255).toFixed(2)})`;}
+          if(l.type==='term') return 'rgba(126,207,193,0.22)';
+          if(l.type==='shared') return `rgba(106,62,183,${Math.min(0.8,(l.shared||1)*0.12)})`;
+          return 'rgba(106,62,183,0.15)';
+        })
+        .linkWidth(l=>l.type==='tweet'?1.5+(l.sim||0)*4:l.type==='shared'?1:0.5)
+        .linkOpacity(0.8)
+        .linkDirectionalParticles(l=>l.type==='tweet'?3:l.type==='term'?1:0)
+        .linkDirectionalParticleWidth(l=>l.type==='tweet'?1.5:0.8)
+        .linkDirectionalParticleColor(l=>l.type==='tweet'?'#ffb49a':'#7ecfc1')
+        .linkDirectionalParticleSpeed(l=>l.type==='tweet'?0.005+(l.sim||0)*0.01:0.004)
+        .onNodeHover(node=>{
+          const tt=document.getElementById('g3-tooltip');
+          if(!node){tt.style.display='none';return;}
+          let html=`<div style="color:#ea7af4;font-size:12px;font-weight:bold;margin-bottom:4px">${node.label}</div>`;
+          if(node.type==='movie'){
+            html+=`<div style="color:#b8a0d8">Year: <span style="color:#f1f1f1">${node.year}</span></div>`;
+            html+=`<div style="color:#b8a0d8">AAVE density: <span style="color:#f1f1f1">${node.density.toFixed(2)}%</span></div>`;
+            html+=`<div style="color:#b8a0d8">Cosine sim: <span style="color:#f1f1f1">${node.cosine.toFixed(4)}</span></div>`;
+            html+=`<div style="color:#b8a0d8">Unique terms: <span style="color:#f1f1f1">${node.unique}</span></div>`;
+          } else if(node.type==='term'){
+            html+=`<div style="color:#b8a0d8">Avg frequency: <span style="color:#f1f1f1">${node.freq}</span></div>`;
+          } else {
+            html+=`<div style="color:#b8a0d8">Top cosine sim: <span style="color:#f1f1f1">${node.topSim.toFixed(4)}</span></div>`;
+          }
+          tt.innerHTML=html; tt.style.display='block';
+        })
+      .onNodeClick(node => {
+         window.location.href = './projects/aave-nlp.html';
+        });
+
+      container.addEventListener('mousemove',e=>{
+        const tt=document.getElementById('g3-tooltip');
+        if(tt.style.display==='block'){tt.style.left=(e.offsetX+14)+'px';tt.style.top=(e.offsetY+14)+'px';}
+      });
+
+      Graph.d3Force('charge').strength(-120);
+      Graph.d3Force('link').distance(l=>l.type==='tweet'?80:l.type==='term'?50:40);
+      setTimeout(()=>Graph.cameraPosition({x:0,y:0,z:320},{x:0,y:0,z:0},2000),100);
+    })();
+    </script>
+
   </body>
 </html>

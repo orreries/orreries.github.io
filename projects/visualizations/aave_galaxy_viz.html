@@ -5,23 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AAVE Galaxy — Oriel's Portfolio</title>
 <style>
-  body { margin: 0; padding: 0; background: #000; }
-  #g-wrap { position:relative; width:100%; height:560px; background:#000; border-radius:2px; overflow:hidden; font-family:Monaco,'Courier New',monospace; }
-  #g-wrap canvas { display:block; position:absolute; top:0; left:0; }
-  #g-label-layer { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; }
-  .film-label { position:absolute; transform:translate(-50%,-100%); pointer-events:none; white-space:nowrap; }
-  .film-label-inner { font-family:Monaco,'Courier New',monospace; font-size:11px; color:#f1f1f1; background:rgba(5,2,15,0.75); border:1px solid rgba(106,62,183,0.6); border-radius:2px; padding:2px 7px; letter-spacing:0.04em; }
-  .film-label-inner span { display:block; font-size:9px; color:rgba(241,241,241,0.4); margin-top:1px; }
-  #g-info { position:absolute; top:12px; left:14px; pointer-events:none; z-index:10; }
-  #g-title { font-size:13px; color:#ea7af4; letter-spacing:0.08em; }
-  #g-sub { font-size:11px; color:rgba(241,241,241,0.45); margin-top:3px; }
-  #g-tooltip { position:absolute; display:none; background:rgba(5,2,15,0.95); border:1px solid #6a3eb7; border-radius:2px; padding:7px 11px; font-size:11px; color:#f1f1f1; line-height:1.7; pointer-events:none; max-width:180px; z-index:20; }
-  #g-tooltip strong { color:#ea7af4; display:block; margin-bottom:2px; }
-  #g-hint { position:absolute; bottom:12px; right:14px; font-size:10px; color:rgba(241,241,241,0.3); text-align:right; line-height:1.7; pointer-events:none; z-index:10; }
-  #g-focus-label { position:absolute; top:12px; right:14px; font-size:11px; color:#ea7af4; pointer-events:none; display:none; z-index:10; }
-  #g-legend { position:absolute; bottom:12px; left:14px; display:flex; flex-wrap:wrap; gap:5px; pointer-events:none; max-width:360px; z-index:10; }
-  .g-leg { font-size:9px; color:rgba(241,241,241,0.45); display:flex; align-items:center; gap:4px; }
-  .g-leg-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  html, body { margin: 0; padding: 0; background: #000; width: 100%; }
+  #g-wrap {
+    position: relative;
+    width: 100%;
+    /* fills viewport height when embedded via iframe, no fixed px */
+    height: 100vh;
+    min-height: 500px;
+    background: #000;
+    overflow: hidden;
+    font-family: Monaco, 'Courier New', monospace;
+  }
+  #g-wrap canvas { display: block; position: absolute; top: 0; left: 0; }
+  #g-label-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+  .film-label { position: absolute; transform: translate(-50%, -100%); pointer-events: none; white-space: nowrap; }
+  .film-label-inner { font-family: Monaco, 'Courier New', monospace; font-size: 11px; color: #f1f1f1; background: rgba(5,2,15,0.80); border: 1px solid rgba(106,62,183,0.6); border-radius: 2px; padding: 3px 8px; letter-spacing: 0.04em; }
+  .film-label-inner span { display: block; font-size: 9px; color: rgba(241,241,241,0.45); margin-top: 1px; }
+  #g-info { position: absolute; top: 12px; left: 14px; pointer-events: none; z-index: 10; }
+  #g-title { font-size: 13px; color: #ea7af4; letter-spacing: 0.08em; }
+  #g-sub { font-size: 11px; color: rgba(241,241,241,0.45); margin-top: 3px; }
+  #g-tooltip { position: absolute; display: none; background: rgba(5,2,15,0.95); border: 1px solid #6a3eb7; border-radius: 2px; padding: 7px 11px; font-size: 11px; color: #f1f1f1; line-height: 1.7; pointer-events: none; max-width: 180px; z-index: 20; }
+  #g-tooltip strong { color: #ea7af4; display: block; margin-bottom: 2px; }
+  #g-hint { position: absolute; bottom: 12px; right: 14px; font-size: 10px; color: rgba(241,241,241,0.3); text-align: right; line-height: 1.7; pointer-events: none; z-index: 10; }
+  #g-focus-label { position: absolute; top: 12px; right: 14px; font-size: 11px; color: #ea7af4; pointer-events: none; display: none; z-index: 10; }
+  #g-legend { position: absolute; bottom: 12px; left: 14px; display: flex; flex-wrap: wrap; gap: 5px 10px; pointer-events: none; max-width: 420px; z-index: 10; }
+  .g-leg { font-size: 9px; color: rgba(241,241,241,0.5); display: flex; align-items: center; gap: 4px; }
+  .g-leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -65,30 +74,47 @@ const MOVIES = [
 
 const wrap = document.getElementById('g-wrap');
 const labelLayer = document.getElementById('g-label-layer');
-const W = wrap.clientWidth, H = wrap.clientHeight;
 
-const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
+function getSize() {
+  return { W: wrap.clientWidth, H: wrap.clientHeight };
+}
+let { W, H } = getSize();
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor(0x000000, 1);
 renderer.setSize(W, H);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-renderer.setClearColor(0x000000,1);
 wrap.insertBefore(renderer.domElement, labelLayer);
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 1000);
-camera.position.set(0, 8, 38);
+const camera = new THREE.PerspectiveCamera(52, W / H, 0.1, 1000);
+
+// Pull camera back enough to see all clusters at once on first load
+// Clusters spread roughly ±15 units; fov 52 → visible radius ~22 at z=46
+camera.position.set(0, 4, 46);
 
 scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 const pl1 = new THREE.PointLight(0xea7af4, 1.2, 80);
-pl1.position.set(0,10,10); scene.add(pl1);
+pl1.position.set(0, 10, 10); scene.add(pl1);
 const pl2 = new THREE.PointLight(0x6a3eb7, 0.8, 80);
-pl2.position.set(-10,-5,-10); scene.add(pl2);
+pl2.position.set(-10, -5, -10); scene.add(pl2);
 
 const allTermCounts = {};
-MOVIES.forEach(m => m.terms.forEach(([w]) => { allTermCounts[w]=(allTermCounts[w]||0)+1; }));
+MOVIES.forEach(m => m.terms.forEach(([w]) => { allTermCounts[w] = (allTermCounts[w] || 0) + 1; }));
 
+// Tighter cluster positions — keep everything within ~±11 units
+// so the full network is visible without zooming out
 const clusterPositions = [
-  [-12,3,-4],[10,-2,6],[-6,-5,8],[8,6,-8],[-14,-3,-10],
-  [4,8,4],[-4,4,-12],[14,-6,-2],[0,-8,-6],[6,-4,10]
+  [-9,  2, -3],   // Tropic Thunder
+  [ 8, -1,  5],   // Next Friday
+  [-5, -4,  6],   // Superbad
+  [ 7,  5, -6],   // Bridesmaids
+  [-10,-2, -8],   // Hot Tub TM
+  [ 3,  7,  3],   // Pineapple Exp.
+  [-3,  3, -9],   // Harold & Kumar
+  [11, -4, -1],   // Scott Pilgrim
+  [ 0, -6, -4],   // Ted
+  [ 5, -3,  8],   // The Hangover
 ];
 
 const movieGroups = [];
@@ -99,195 +125,228 @@ scene.add(pivot);
 
 MOVIES.forEach((movie, mi) => {
   const group = new THREE.Group();
-  const [cx,cy,cz] = clusterPositions[mi];
-  group.position.set(cx,cy,cz);
+  const [cx, cy, cz] = clusterPositions[mi];
+  group.position.set(cx, cy, cz);
 
-  const maxCount = Math.max(...movie.terms.map(t=>t[1]));
+  const maxCount = Math.max(...movie.terms.map(t => t[1]));
   const used = [];
 
-  movie.terms.forEach(([word,count]) => {
-    const r = 0.12 + (count/maxCount)*0.55;
+  movie.terms.forEach(([word, count]) => {
+    const r = 0.12 + (count / maxCount) * 0.52;
     const shared = allTermCounts[word] > 1;
-    const geo = new THREE.SphereGeometry(r,14,10);
+    const geo = new THREE.SphereGeometry(r, 14, 10);
     const mat = new THREE.MeshPhongMaterial({
       color: shared ? 0xffffff : movie.color,
       emissive: shared ? 0xffffff : movie.color,
       emissiveIntensity: shared ? 0.35 : 0.18,
-      shininess: 60, transparent:true,
+      shininess: 60, transparent: true,
       opacity: shared ? 0.95 : 0.78,
     });
-    const sphere = new THREE.Mesh(geo,mat);
+    const sphere = new THREE.Mesh(geo, mat);
 
-    let px,py,pz,tries=0;
+    let px, py, pz, tries = 0;
     do {
-      const theta = Math.random()*Math.PI*2;
-      const phi = Math.acos(2*Math.random()-1);
-      const dist = 0.5+Math.random()*3.2;
-      px = dist*Math.sin(phi)*Math.cos(theta);
-      py = dist*Math.sin(phi)*Math.sin(theta);
-      pz = dist*Math.cos(phi);
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const dist = 0.4 + Math.random() * 2.8;
+      px = dist * Math.sin(phi) * Math.cos(theta);
+      py = dist * Math.sin(phi) * Math.sin(theta);
+      pz = dist * Math.cos(phi);
       tries++;
-    } while(tries<30 && used.some(u=>Math.hypot(px-u[0],py-u[1],pz-u[2])<r*2.5+0.2));
-    used.push([px,py,pz]);
+    } while (tries < 30 && used.some(u => Math.hypot(px - u[0], py - u[1], pz - u[2]) < r * 2.5 + 0.2));
+    used.push([px, py, pz]);
 
-    sphere.position.set(px,py,pz);
-    sphere.userData = { word, count, movie:movie.title, shared, movieIndex:mi };
+    sphere.position.set(px, py, pz);
+    sphere.userData = { word, count, movie: movie.title, shared, movieIndex: mi };
     group.add(sphere);
     allSpheres.push(sphere);
   });
 
-  const coreGeo = new THREE.SphereGeometry(0.22,12,8);
-  const coreMat = new THREE.MeshPhongMaterial({ color:movie.color, emissive:movie.color, emissiveIntensity:0.6, shininess:80 });
-  const core = new THREE.Mesh(coreGeo,coreMat);
-  core.userData = { isCore:true, movie:movie.title, cosine:movie.cosine, density:movie.density, movieIndex:mi };
+  // Core sphere
+  const coreGeo = new THREE.SphereGeometry(0.22, 12, 8);
+  const coreMat = new THREE.MeshPhongMaterial({
+    color: movie.color, emissive: movie.color,
+    emissiveIntensity: 0.6, shininess: 80
+  });
+  const core = new THREE.Mesh(coreGeo, coreMat);
+  core.userData = { isCore: true, movie: movie.title, cosine: movie.cosine, density: movie.density, movieIndex: mi };
   group.add(core);
 
-  const hex = '#'+movie.color.toString(16).padStart(6,'0');
+  // Label
+  const hex = '#' + movie.color.toString(16).padStart(6, '0');
   const labelEl = document.createElement('div');
   labelEl.className = 'film-label';
   labelEl.innerHTML = `<div class="film-label-inner" style="border-color:${hex}88;color:${hex}">${movie.title}<span>${movie.year} · sim ${movie.cosine.toFixed(3)}</span></div>`;
   labelLayer.appendChild(labelEl);
-  labelEls.push({ el:labelEl, group, offset:new THREE.Vector3(0,4.2,0) });
+  labelEls.push({ el: labelEl, group, offset: new THREE.Vector3(0, 3.8, 0) });
 
   pivot.add(group);
   movieGroups.push(group);
 });
 
+// Stars
 const starGeo = new THREE.BufferGeometry();
 const sv = [];
-for(let i=0;i<1400;i++) sv.push((Math.random()-.5)*120,(Math.random()-.5)*120,(Math.random()-.5)*120);
-starGeo.setAttribute('position',new THREE.Float32BufferAttribute(sv,3));
-scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:0.08,transparent:true,opacity:0.5})));
+for (let i = 0; i < 1400; i++) sv.push((Math.random() - .5) * 120, (Math.random() - .5) * 120, (Math.random() - .5) * 120);
+starGeo.setAttribute('position', new THREE.Float32BufferAttribute(sv, 3));
+scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.08, transparent: true, opacity: 0.5 })));
 
-const lineMat = new THREE.LineBasicMaterial({color:0x6a3eb7,transparent:true,opacity:0.18});
-Object.keys(allTermCounts).filter(w=>allTermCounts[w]>2).forEach(term => {
-  const involved = MOVIES.filter(m=>m.terms.some(([w])=>w===term));
-  for(let i=0;i<involved.length-1;i++){
-    const a=clusterPositions[MOVIES.indexOf(involved[i])];
-    const b=clusterPositions[MOVIES.indexOf(involved[i+1])];
-    const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a),new THREE.Vector3(...b)]);
-    pivot.add(new THREE.Line(geo,lineMat));
+// Connection lines between clusters sharing terms
+const lineMat = new THREE.LineBasicMaterial({ color: 0x6a3eb7, transparent: true, opacity: 0.18 });
+Object.keys(allTermCounts).filter(w => allTermCounts[w] > 2).forEach(term => {
+  const involved = MOVIES.filter(m => m.terms.some(([w]) => w === term));
+  for (let i = 0; i < involved.length - 1; i++) {
+    const a = clusterPositions[MOVIES.indexOf(involved[i])];
+    const b = clusterPositions[MOVIES.indexOf(involved[i + 1])];
+    const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...a), new THREE.Vector3(...b)]);
+    pivot.add(new THREE.Line(geo, lineMat));
   }
 });
 
-let isDragging=false, prevMouse={x:0,y:0};
-let rotX=0.15, rotY=0, targetRotX=0.15, targetRotY=0;
-let zoom=38, targetZoom=38;
-let focusIndex=-1;
+// Controls
+let isDragging = false, prevMouse = { x: 0, y: 0 };
+let rotX = 0.12, rotY = 0, targetRotX = 0.12, targetRotY = 0;
+let zoom = 46, targetZoom = 46;
+let focusIndex = -1;
 
 const canvas = renderer.domElement;
-canvas.style.cursor='grab';
+canvas.style.cursor = 'grab';
 
-canvas.addEventListener('mousedown',e=>{isDragging=true;prevMouse={x:e.clientX,y:e.clientY};canvas.style.cursor='grabbing';});
-canvas.addEventListener('mouseup',()=>{isDragging=false;canvas.style.cursor='grab';});
-canvas.addEventListener('mouseleave',()=>{isDragging=false;canvas.style.cursor='grab';});
-canvas.addEventListener('mousemove',e=>{
-  if(isDragging){
-    targetRotY+=(e.clientX-prevMouse.x)*0.008;
-    targetRotX+=(e.clientY-prevMouse.y)*0.008;
-    targetRotX=Math.max(-1.2,Math.min(1.2,targetRotX));
-    prevMouse={x:e.clientX,y:e.clientY};
+canvas.addEventListener('mousedown', e => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; canvas.style.cursor = 'grabbing'; });
+canvas.addEventListener('mouseup', () => { isDragging = false; canvas.style.cursor = 'grab'; });
+canvas.addEventListener('mouseleave', () => { isDragging = false; });
+canvas.addEventListener('mousemove', e => {
+  if (isDragging) {
+    targetRotY += (e.clientX - prevMouse.x) * 0.008;
+    targetRotX += (e.clientY - prevMouse.y) * 0.008;
+    targetRotX = Math.max(-1.2, Math.min(1.2, targetRotX));
+    prevMouse = { x: e.clientX, y: e.clientY };
   }
   handleHover(e);
 });
-canvas.addEventListener('wheel',e=>{e.preventDefault();targetZoom=Math.max(8,Math.min(70,targetZoom+e.deltaY*0.04));},{passive:false});
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  targetZoom = Math.max(8, Math.min(80, targetZoom + e.deltaY * 0.04));
+}, { passive: false });
 
-const raycaster=new THREE.Raycaster();
-const mouse=new THREE.Vector2();
-const tip=document.getElementById('g-tooltip');
-const focusLabel=document.getElementById('g-focus-label');
+// Touch support
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) { isDragging = true; prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }
+});
+canvas.addEventListener('touchend', () => { isDragging = false; });
+canvas.addEventListener('touchmove', e => {
+  if (isDragging && e.touches.length === 1) {
+    targetRotY += (e.touches[0].clientX - prevMouse.x) * 0.008;
+    targetRotX += (e.touches[0].clientY - prevMouse.y) * 0.008;
+    targetRotX = Math.max(-1.2, Math.min(1.2, targetRotX));
+    prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+});
 
-function handleHover(e){
-  const rect=canvas.getBoundingClientRect();
-  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
-  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
-  raycaster.setFromCamera(mouse,camera);
-  const hits=raycaster.intersectObjects(allSpheres);
-  if(hits.length>0){
-    const d=hits[0].object.userData;
-    canvas.style.cursor=isDragging?'grabbing':'pointer';
-    const html=d.isCore
-      ?`<strong>${d.movie}</strong>cosine sim: ${d.cosine.toFixed(4)}<br>density: ${d.density.toFixed(2)}%`
-      :`<strong>${d.word}</strong>${d.movie}<br>count: ${d.count}${d.shared?'<br><span style="color:#67e8f9;font-size:10px">shared across films</span>':''}`;
-    tip.innerHTML=html;
-    tip.style.display='block';
-    const wRect=wrap.getBoundingClientRect();
-    tip.style.left=(e.clientX-wRect.left+14)+'px';
-    tip.style.top=(e.clientY-wRect.top+14)+'px';
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const tip = document.getElementById('g-tooltip');
+const focusLabel = document.getElementById('g-focus-label');
+
+function handleHover(e) {
+  const rect = canvas.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(allSpheres);
+  if (hits.length > 0) {
+    const d = hits[0].object.userData;
+    canvas.style.cursor = isDragging ? 'grabbing' : 'pointer';
+    const html = d.isCore
+      ? `<strong>${d.movie}</strong>cosine sim: ${d.cosine.toFixed(4)}<br>density: ${d.density.toFixed(2)}%`
+      : `<strong>${d.word}</strong>${d.movie}<br>count: ${d.count}${d.shared ? '<br><span style="color:#67e8f9;font-size:10px">shared across films</span>' : ''}`;
+    tip.innerHTML = html;
+    tip.style.display = 'block';
+    const wRect = wrap.getBoundingClientRect();
+    tip.style.left = (e.clientX - wRect.left + 14) + 'px';
+    tip.style.top = (e.clientY - wRect.top + 14) + 'px';
   } else {
-    tip.style.display='none';
-    canvas.style.cursor=isDragging?'grabbing':'grab';
+    tip.style.display = 'none';
+    canvas.style.cursor = isDragging ? 'grabbing' : 'grab';
   }
 }
 
-canvas.addEventListener('click',e=>{
-  const rect=canvas.getBoundingClientRect();
-  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
-  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
-  raycaster.setFromCamera(mouse,camera);
-  const hits=raycaster.intersectObjects(allSpheres);
-  if(hits.length>0){
-    const mi=hits[0].object.userData.movieIndex;
-    if(mi===undefined) return;
-    if(focusIndex===mi){
-      focusIndex=-1; targetZoom=38;
-      focusLabel.style.display='none';
-      movieGroups.forEach(g=>g.traverse(o=>{if(o.isMesh)o.material.opacity=o.userData.shared?0.95:0.78;}));
-      labelEls.forEach(l=>{ l.el.style.opacity='1'; });
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(allSpheres);
+  if (hits.length > 0) {
+    const mi = hits[0].object.userData.movieIndex;
+    if (mi === undefined) return;
+    if (focusIndex === mi) {
+      focusIndex = -1; targetZoom = 46;
+      focusLabel.style.display = 'none';
+      movieGroups.forEach(g => g.traverse(o => { if (o.isMesh) o.material.opacity = o.userData.shared ? 0.95 : 0.78; }));
+      labelEls.forEach(l => { l.el.style.opacity = '1'; });
     } else {
-      focusIndex=mi;
-      const pos=clusterPositions[mi];
-      targetZoom=18;
-      targetRotY=-Math.atan2(pos[0],pos[2]);
-      focusLabel.textContent=MOVIES[mi].title+' — click again to reset';
-      focusLabel.style.display='block';
-      movieGroups.forEach((g,gi)=>g.traverse(o=>{
-        if(o.isMesh) o.material.opacity=gi===mi?(o.userData.shared?0.98:0.9):0.06;
+      focusIndex = mi;
+      targetZoom = 18;
+      const pos = clusterPositions[mi];
+      targetRotY = -Math.atan2(pos[0], pos[2]);
+      focusLabel.textContent = MOVIES[mi].title + ' — click again to reset';
+      focusLabel.style.display = 'block';
+      movieGroups.forEach((g, gi) => g.traverse(o => {
+        if (o.isMesh) o.material.opacity = gi === mi ? (o.userData.shared ? 0.98 : 0.9) : 0.06;
       }));
-      labelEls.forEach((l,li)=>{ l.el.style.opacity=li===mi?'1':'0.15'; });
+      labelEls.forEach((l, li) => { l.el.style.opacity = li === mi ? '1' : '0.15'; });
     }
   }
 });
 
-const legend=document.getElementById('g-legend');
-MOVIES.forEach(m=>{
-  const hex='#'+m.color.toString(16).padStart(6,'0');
-  legend.innerHTML+=`<div class="g-leg"><div class="g-leg-dot" style="background:${hex}"></div><span>${m.title}</span></div>`;
+// Legend
+const legend = document.getElementById('g-legend');
+MOVIES.forEach(m => {
+  const hex = '#' + m.color.toString(16).padStart(6, '0');
+  legend.innerHTML += `<div class="g-leg"><div class="g-leg-dot" style="background:${hex}"></div><span>${m.title}</span></div>`;
 });
 
-const _v3=new THREE.Vector3();
-let t=0;
+// Resize handler
+window.addEventListener('resize', () => {
+  const { W: nW, H: nH } = getSize();
+  renderer.setSize(nW, nH);
+  camera.aspect = nW / nH;
+  camera.updateProjectionMatrix();
+});
 
-function updateLabels(){
-  labelEls.forEach(({el,group,offset})=>{
+const _v3 = new THREE.Vector3();
+let t = 0;
+
+function updateLabels() {
+  const { W: cW, H: cH } = getSize();
+  labelEls.forEach(({ el, group, offset }) => {
     _v3.copy(group.position).add(offset);
     pivot.localToWorld(_v3);
-    const projected=_v3.clone().project(camera);
-    if(projected.z>1){ el.style.display='none'; return; }
-    el.style.display='block';
-    const sx=(projected.x*0.5+0.5)*W;
-    const sy=(-projected.y*0.5+0.5)*H;
-    el.style.left=sx+'px';
-    el.style.top=sy+'px';
+    const projected = _v3.clone().project(camera);
+    if (projected.z > 1) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.style.left = (projected.x * 0.5 + 0.5) * cW + 'px';
+    el.style.top = (-projected.y * 0.5 + 0.5) * cH + 'px';
   });
 }
 
-function animate(){
+function animate() {
   requestAnimationFrame(animate);
-  t+=0.004;
-  rotX+=(targetRotX-rotX)*0.06;
-  rotY+=(targetRotY-rotY)*0.06;
-  zoom+=(targetZoom-zoom)*0.06;
-  pivot.rotation.x=rotX;
-  pivot.rotation.y=rotY;
-  camera.position.z=zoom;
-  movieGroups.forEach((g,gi)=>{
-    g.rotation.y=t*(0.06+gi*0.008)*(gi%2===0?1:-1);
+  t += 0.004;
+  rotX += (targetRotX - rotX) * 0.06;
+  rotY += (targetRotY - rotY) * 0.06;
+  zoom += (targetZoom - zoom) * 0.06;
+  pivot.rotation.x = rotX;
+  pivot.rotation.y = rotY;
+  camera.position.z = zoom;
+  movieGroups.forEach((g, gi) => {
+    g.rotation.y = t * (0.06 + gi * 0.008) * (gi % 2 === 0 ? 1 : -1);
   });
-  pl1.position.x=Math.sin(t*0.5)*15;
-  pl1.position.z=Math.cos(t*0.5)*15;
+  pl1.position.x = Math.sin(t * 0.5) * 15;
+  pl1.position.z = Math.cos(t * 0.5) * 15;
   updateLabels();
-  renderer.render(scene,camera);
+  renderer.render(scene, camera);
 }
 animate();
 </script>
