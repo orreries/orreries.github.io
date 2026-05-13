@@ -50,7 +50,7 @@
       font-family: var(--font);
       line-height: 1.2;
       background: var(--background-color);
-      background-image: url("https://orreries.github.io/images/bgstarz3.gif");
+      background-image: url("../images/bgstarz3.gif");
     }
 
     /* ── LAYOUT ── */
@@ -71,7 +71,7 @@
       font-size: 1.2em;
       border: var(--border);
       background-color: var(--content-background-color);
-      background-image: url("https://orreries.github.io/images/vaporwave.jpeg");
+      background-image: url("../images/vaporwave.jpeg");
       background-size: cover;
       background-position: center;
     }
@@ -440,19 +440,20 @@
   <!-- HEADER -->
   <header>
     <div class="header-content">
-      <div class="header-title"><a href="https://orreries.github.io/index.html" target="_top" style="text-decoration:none;color:inherit;">Oriel's Portfolio</a> <span style="font-size:0.45em;color:#ea7af4;font-family:Monaco,monospace;letter-spacing:2px;">[STAGING]</span></div>
+      <div class="header-title"><a href="../index.html" target="portfolio-frame" style="text-decoration:none;color:inherit;">Oriel's Portfolio</a></div>
       <nav>
         <ul>
-          <li><a href="https://orreries.github.io/home.html" target="_top">Home</a></li>
+          <li><a href="../home.html" target="portfolio-frame">Home</a></li>
           <li>
             <a href="#">Projects ▾</a>
             <ul>
               <li><a href="#">AAVE NLP (this page)</a></li>
-              <li><a href="https://orreries.github.io/projects/qoz-geospatial.html">QOZ Analysis</a></li>
-              <li><a href="https://orreries.github.io/projects/institutional-revenue.html">Institutional Revenue</a></li>
+              <li><a href="../projects/qoz-geospatial.html">QOZ Analysis</a></li>
+              <li><a href="../projects/institutional-revenue.html">Institutional Revenue</a></li>
             </ul>
           </li>
-          <li><a href="https://orreries.github.io/resume.html" target="_top">Resume</a></li>
+          <li><a href="../resume.html" target="portfolio-frame">Resume</a></li>
+          <li><a href="../archive.html" target="portfolio-frame">Archive</a></li>
         </ul>
       </nav>
     </div>
@@ -469,8 +470,8 @@
       <div class="sidebar-title">Projects</div>
       <ul>
         <li><a href="#">AAVE NLP Analysis</a></li>
-        <li><a href="https://orreries.github.io/projects/qoz-geospatial.html">QOZ Efficacy</a></li>
-        <li><a href="https://orreries.github.io/projects/institutional-revenue.html">Institutional Revenue</a></li>
+        <li><a href="../projects/qoz-geospatial.html">QOZ Efficacy</a></li>
+        <li><a href="../projects/institutional-revenue.html">Institutional Revenue</a></li>
       </ul>
     </div>
     <div class="sidebar-section">
@@ -503,14 +504,15 @@
         <div class="wip-text-col">
           <div class="wip-title">⚠ UNDER CONSTRUCTION ⚠</div>
           <div class="wip-subtitle">
-            This page is a <span style="color:#ffff00;">WORK IN PROGRESS</span> <br>
+            This page is a <span style="color:#ffff00;">WORK IN PROGRESS</span> staging preview.<br>
             New visualizations are being added — check back soon!
           </div>
           <div class="wip-note">
             🔧 Currently working on: expanded NLP visualizations &amp; embedding space plots<br>
-           </div>
+            📅 Live site: <a href="https://orreries.github.io/projects/aave-nlp.html" style="color:#ffff00;">orreries.github.io</a>
+          </div>
           <div class="wip-progress">
-            <div class="wip-progress-label">Page completion: ████████████░░░ 90%</div>
+            <div class="wip-progress-label">Page completion: ██████░░░░ 60%</div>
             <div class="wip-bar-outer"><div class="wip-bar-inner"></div></div>
           </div>
         </div>
@@ -672,7 +674,7 @@ individual_similarities = cosine_similarity(script_embedding, tweet_embeddings)[
       </ul>
 
       <hr />
-      <p><a href="https://orreries.github.io/home.html">← Back to all projects</a></p>
+      <p><a href="../home.html">← Back to all projects</a></p>
     </section>
 
   </main>
