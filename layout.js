@@ -16,20 +16,20 @@ function headerHTML() {
   return `
       <header>
         <div class="header-content">
-          <div class="header-title"><a href="${nesting}index.html" target="portfolio-frame" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
+          <div class="header-title"><a href="#" onclick="navTo('${nesting}home.html');return false;" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
           <nav>
             <ul>
-              <li><a href="${nesting}home.html" target="portfolio-frame">Home</a></li>
+              <li><a href="#" onclick="navTo('${nesting}home.html');return false;">Home</a></li>
               <li class="dropdown">
                 <a href="#">Projects ▾</a>
                 <ul class="dropdown-menu">
-                  <li><a href="${nesting}projects/aave-nlp.html">AAVE NLP</a></li>
-                  <li><a href="${nesting}projects/qoz-geospatial.html">QOZ Analysis</a></li>
-                  <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
+                  <li><a href="#" onclick="navTo('${nesting}projects/aave-nlp.html');return false;">AAVE NLP</a></li>
+                  <li><a href="#" onclick="navTo('${nesting}projects/qoz-geospatial.html');return false;">QOZ Analysis</a></li>
+                  <li><a href="#" onclick="navTo('${nesting}projects/institutional-revenue.html');return false;">Institutional Revenue</a></li>
                 </ul>
               </li>
-              <li><a href="${nesting}resume.html" target="portfolio-frame">Resume</a></li>
-              <li><a href="${nesting}archive.html" target="portfolio-frame">Archive</a></li>
+              <li><a href="#" onclick="navTo('${nesting}resume.html');return false;">Resume</a></li>
+              <li><a href="#" onclick="navTo('${nesting}archive.html');return false;">Archive</a></li>
             </ul>
           </nav>
         </div>
@@ -46,16 +46,16 @@ function headerHTML() {
         <div class="sidebar-section">
           <div class="sidebar-title">Projects</div>
           <ul>
-            <li><a href="${nesting}projects/aave-nlp.html">AAVE NLP Analysis</a></li>
-            <li><a href="${nesting}projects/qoz-geospatial.html">QOZ Efficacy</a></li>
-            <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
+            <li><a href="#" onclick="navTo('${nesting}projects/aave-nlp.html');return false;">AAVE NLP Analysis</a></li>
+            <li><a href="#" onclick="navTo('${nesting}projects/qoz-geospatial.html');return false;">QOZ Efficacy</a></li>
+            <li><a href="#" onclick="navTo('${nesting}projects/institutional-revenue.html');return false;">Institutional Revenue</a></li>
           </ul>
         </div>
 
         <div class="sidebar-section">
           <div class="sidebar-title">Archive</div>
           <ul>
-            <li><a href="${nesting}archive.html">Visualizations & Experiments</a></li>
+            <li><a href="#" onclick="navTo('${nesting}archive.html');return false;">Visualizations & Experiments</a></li>
           </ul>
         </div>
 
@@ -70,6 +70,16 @@ function headerHTML() {
 
       </aside>
   `;
+}
+
+// Navigates within the XP portfolio-frame iframe if the page is inside it,
+// otherwise falls back to normal navigation.
+function navTo(url) {
+  try {
+    const frame = window.parent.document.getElementById('portfolio-frame');
+    if (frame) { frame.src = url; return; }
+  } catch(e) {}
+  window.location.href = url;
 }
 
 function footerHTML() {
