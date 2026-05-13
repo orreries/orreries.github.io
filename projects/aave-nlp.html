@@ -227,8 +227,8 @@
       <div class="sidebar-title">Projects</div>
       <ul>
         <li><a href="#">AAVE NLP Analysis</a></li>
-        <li><a href="../projects/qoz-geospatial.html">QOZ Efficacy</a></li>
-        <li><a href="../projects/institutional-revenue.html">Institutional Revenue</a></li>
+        <li><a href="#" onclick="navTo('../projects/qoz-geospatial.html');return false;">QOZ Efficacy</a></li>
+        <li><a href="#" onclick="navTo('../projects/institutional-revenue.html');return false;">Institutional Revenue</a></li>
       </ul>
     </div>
     <div class="sidebar-section">
@@ -332,38 +332,23 @@ individual_similarities = cosine_similarity(script_embedding, tweet_embeddings)[
 
       <h2>Results</h2>
       <p>
-        The pipeline produced consistent, reproducible metrics across all ten scripts. AAVE presence is uneven and often superficial in films outside of culturally specific contexts. Even when AAVE terms appear, semantic similarity scores remain relatively low which suggests models are not capturing deeper linguistic structure.
+        The pipeline produced consistent, reproducible metrics across all ten scripts. AAVE presence is uneven and often superficial — films outside of culturally specific contexts tend to register AAVE terms incidentally rather than as a meaningful feature of the dialogue. Tropic Thunder had the highest lexical density at 0.74%, while The Hangover sat at the low end with 0.42%. But even at the high end, these numbers are modest, and when you look at the semantic similarity scores the picture gets starker: cosine similarity between scripts and the tweet corpus rarely exceeded 0.23, suggesting that models aren't picking up on AAVE as a distinct linguistic register — they're mostly seeing topic overlap.
+      </p>
+      <p>
+        The galaxy below maps all ten films as clusters of orbiting word-spheres. Each sphere represents a term found in that film's script, sized by how frequently it appeared. White spheres are terms shared across multiple films — and notably, the most shared terms tend to be the most semantically neutral ones, like "if" and "been," which show up across every script regardless of cultural context. The purple lines connect clusters that share those high-frequency terms, making visible just how much lexical overlap exists between films that are otherwise very different. Drag to orbit, scroll to zoom, and click any cluster to isolate it.
       </p>
 
-      <h2 class="sr-only">Interactive AAVE word distribution visualization across 10 comedy movie scripts, showing term frequency as bubble and word cloud views.</h2>
+      <iframe
+        src="./visualizations/aave_galaxy_viz.html"
+        width="100%"
+        height="580px"
+        style="border: 1px solid #6a3eb7; border-radius: 2px; display: block;"
+        title="AAVE word distribution galaxy visualization"
+      ></iframe>
 
-      <style>
-        .aave-viz { font-family: Monaco, 'Courier New', monospace; padding: 1rem 0; color: var(--color-text-primary); }
-        .ctrl-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 1rem; }
-        .movie-btn { background: transparent; border: 1px solid var(--color-border-secondary); border-radius: 2px; padding: 4px 10px; font-family: Monaco, monospace; font-size: 11px; color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-        .movie-btn:hover { border-color: #ea7af4; color: #ea7af4; }
-        .movie-btn.active { background: rgba(106,62,183,0.25); border-color: #6a3eb7; color: #ea7af4; }
-        .view-toggle { display: flex; border: 1px solid var(--color-border-secondary); border-radius: 2px; overflow: hidden; margin-left: auto; }
-        .view-btn { background: transparent; border: none; padding: 5px 14px; font-family: Monaco, monospace; font-size: 11px; color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
-        .view-btn.active { background: rgba(106,62,183,0.3); color: #ea7af4; }
-        .stats-row { display: flex; gap: 12px; margin-bottom: 0.75rem; flex-wrap: wrap; }
-        .stat-pill { font-size: 11px; color: var(--color-text-secondary); border: 1px solid var(--color-border-tertiary); border-radius: 2px; padding: 3px 8px; }
-        .stat-pill span { color: #ea7af4; font-weight: 500; }
-        #aave-canvas { width: 100%; height: 420px; position: relative; overflow: hidden; border: 1px solid rgba(106,62,183,0.3); border-radius: 2px; background: rgba(0,0,0,0.4); }
-        #aave-canvas svg { position: absolute; top:0; left:0; width:100%; height:100%; }
-        .tooltip { position: absolute; pointer-events: none; background: rgba(10,5,20,0.95); border: 1px solid #6a3eb7; border-radius: 2px; padding: 6px 10px; font-size: 11px; color: #f1f1f1; line-height: 1.6; z-index: 10; display: none; max-width: 160px; }
-        .tooltip strong { color: #ea7af4; }
-      </style>
-
-      <iframe 
-      src="./visualizations/aave_galaxy_viz.html"
-      width="100%" 
-      height="580px" 
-      style="border: 1px solid #6a3eb7; border-radius: 2px; display: block;"
-      title="AAVE word distribution galaxy visualization"
-    ></iframe>
-
-      <p>The tables above show AAVE density by film, the most frequent terms per script, and cosine similarity scores against the tweet corpus.</p>
+      <p>
+        What's striking about the network is how densely connected everything is — almost every film shares terms with almost every other film, but that's less a sign of rich AAVE representation and more a reflection of how surface-level the lexical matching is. The terms doing most of the connecting ("if," "been," "hit," "school") are words that exist in standard English too. The model can't distinguish between someone using "real" as AAVE emphasis and someone using it as a plain adjective.
+      </p>
 
       <h2>Key Points</h2>
       <p>
@@ -401,98 +386,7 @@ individual_similarities = cosine_similarity(script_embedding, tweet_embeddings)[
 
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-/* ── Tab data ── */
-const overviewData = [
-  ["Tropic Thunder", 21331, 157, 0.74, 36],
-  ["Next Friday", 15665, 111, 0.71, 25],
-  ["Superbad", 15665, 111, 0.71, 25],
-  ["Bridesmaids", 15665, 111, 0.71, 25],
-  ["Hot Tub Time Machine", 15665, 111, 0.71, 25],
-  ["Pineapple Express", 21970, 149, 0.68, 25],
-  ["Harold & Kumar", 25891, 153, 0.59, 28],
-  ["Scott Pilgrim", 24627, 121, 0.49, 26],
-  ["Ted", 26819, 130, 0.48, 29],
-  ["The Hangover", 20568, 86, 0.42, 22],
-];
-
-const byMovieData = [
-  { title: "Next Friday (2000)", coverage: "10.55%", terms: "bank, beat, been, boss, drop, extra, fire, ghetto, hit, ice, if, imma, laid, mad, mean, n, real, roll, school, snatched, thick, tight, trash, trip, wig" },
-  { title: "Superbad (2007)", coverage: "10.55%", terms: "bank, beat, been, boss, drop, extra, fire, ghetto, hit, ice, if, imma, laid, mad, mean, n, real, roll, school, snatched, thick, tight, trash, trip, wig" },
-  { title: "Bridesmaids (2011)", coverage: "10.55%", terms: "bank, beat, been, boss, drop, extra, fire, ghetto, hit, ice, if, imma, laid, mad, mean, n, real, roll, school, snatched, thick, tight, trash, trip, wig" },
-  { title: "Hot Tub Time Machine (2010)", coverage: "10.55%", terms: "bank, beat, been, boss, drop, extra, fire, ghetto, hit, ice, if, imma, laid, mad, mean, n, real, roll, school, snatched, thick, tight, trash, trip, wig" },
-  { title: "Harold & Kumar Go to White Castle (2004)", coverage: "11.81%", terms: "beat, beef, been, carry, chill, cop, dime, done, dope, drag, drop, dry, extra, filthy, fire, hit, if, laid, lit, mad, mans, mean, n, read, roll, school, thick, trip" },
-  { title: "The Hangover (2009)", coverage: "9.28%", terms: "bank, beat, been, bet, boss, coin, done, filthy, fire, g, hit, ice, if, laid, mad, mans, mean, pressed, real, roll, school, tight" },
-  { title: "Scott Pilgrim vs. The World (2010)", coverage: "10.97%", terms: "beat, beef, been, bet, coin, done, drop, dry, fierce, fire, hit, homies, if, mad, mean, n, period, pressed, racks, read, real, school, shade, tea, trash, woke" },
-  { title: "Pineapple Express (2008)", coverage: "10.55%", terms: "ate, beat, been, bet, chill, cop, done, dope, drag, fire, hit, if, kush, lit, mad, mans, mean, n, read, real, school, serve, slumped, tea, thick" },
-  { title: "Ted (2012)", coverage: "12.24%", terms: "beat, been, bet, boss, carry, chill, cop, done, drag, drop, extra, g, hit, ice, if, lit, mans, mean, n, plug, read, real, roll, school, shook, tight, trash, wig, woke" },
-  { title: "Tropic Thunder (2008)", coverage: "15.19% (highest)", terms: "bank, beat, been, bet, cap, carry, cat, chill, din, done, drag, drop, dry, fierce, fire, g, heated, hit, if, link, mad, mans, mean, n, playin, plug, read, real, roll, school, serve, slumped, tea, thick, trip, vibe" },
-];
-
-const topTermsData = [
-  { title: "Next Friday (2000)", terms: [["if",25],["imma",24],["hit",13],["been",9],["real",6]] },
-  { title: "Superbad (2007)", terms: [["if",25],["imma",24],["hit",13],["been",9],["real",6]] },
-  { title: "Bridesmaids (2011)", terms: [["if",25],["imma",24],["hit",13],["been",9],["real",6]] },
-  { title: "Hot Tub Time Machine (2010)", terms: [["if",25],["imma",24],["hit",13],["been",9],["real",6]] },
-  { title: "Harold & Kumar (2004)", terms: [["if",43],["been",31],["hit",15],["cop",13],["school",9]] },
-  { title: "The Hangover (2009)", terms: [["if",29],["been",15],["real",6],["tight",5],["beat",4]] },
-  { title: "Scott Pilgrim (2010)", terms: [["if",46],["been",16],["school",12],["mean",8],["hit",5]] },
-  { title: "Pineapple Express (2008)", terms: [["if",41],["cop",20],["been",18],["hit",14],["school",9]] },
-  { title: "Ted (2012)", terms: [["if",41],["been",23],["mean",8],["hit",8],["beat",4]] },
-  { title: "Tropic Thunder (2008)", terms: [["if",37],["real",19],["been",19],["fire",10],["mean",10]] },
-];
-
-const simData = [
-  { movie: "Next Friday", year: 2000, cosine: 0.2208, mean: 0.1268, max: 0.3536, min: -0.0911, std: 0.0597, tweets: [["0.3536","cops touching on kids again its in the dna..."],["0.3226","heard someone getting their life slapped out of them in target on black friday..."],["0.3170","i aint got time to be black friday shopping you aint got the money either..."],["0.3042","when youre talkin slick smokin one on the porch and that cool uncle tries to slide..."]]},
-  { movie: "Superbad", year: 2007, cosine: 0.2013, mean: 0.1156, max: 0.3176, min: -0.0867, std: 0.0604, tweets: [["0.3176","the throws in a diversity montage oscarssowhite..."],["0.3056","sequels remakes amp oscarssowhite whats the deal hollywood..."],["0.3029","that adhd show presents oscarssowhite..."],["0.3001","thank you for being true to urself amp oscarssowhite..."]]},
-  { movie: "Bridesmaids", year: 2011, cosine: 0.2217, mean: 0.1274, max: 0.3421, min: -0.0500, std: 0.0692, tweets: [["0.3421","the odd couple oscarssowhite..."],["0.3308","auntie you still single me you still in and out the abortion clinic thanksgivingclapback..."],["0.3176","speaking of the oscars oscarssowhite..."],["0.3121","aunt didnt you wear that last year me didnt you wear a wedding ring last year..."]]},
-  { movie: "The Hangover", year: 2009, cosine: 0.2339, mean: 0.1344, max: 0.3603, min: -0.0857, std: 0.0774, tweets: [["0.3603","u look like ure hungover n strugglin me like ur belly n the button thanksgivingclapback..."],["0.3272","thanksgivingclapback latino edition..."],["0.3151","its the most wonderful time of the year when i eat leftovers and read thanksgivingclapback..."],["0.3140","im laughing so hard reading through thanksgivingclapback..."]]},
-  { movie: "Hot Tub Time Machine", year: 2010, cosine: 0.2040, mean: 0.1172, max: 0.3534, min: -0.0808, std: 0.0714, tweets: [["0.3534","and thats how you hershey hersheypark blackmoms..."],["0.3334","crazy uncle you have on too much makeup me and you snort up too much cocaine thanksgivingclapback..."],["0.3245","grandma pick up yo pants me pick up yo titties thanksgivingclapback..."],["0.3093","mom honey this mac amp cheese kinda dry pops just like ya pussy me slowly dying..."]]},
-  { movie: "Harold & Kumar", year: 2004, cosine: 0.0892, mean: 0.0512, max: 0.3035, min: -0.1327, std: 0.0744, tweets: [["0.3035","white hollywood cartoon oscarssowhite..."],["0.2975","and the oscar goes to this white person oscarssowhite..."],["0.2704","hollywood we have a problem oscarssowhite diversity..."],["0.2631","trying to write about oscarnoms but im too blinded by their whiteness oscarssowhite..."]]},
-  { movie: "Scott Pilgrim", year: 2010, cosine: 0.1146, mean: 0.0658, max: 0.2399, min: -0.1304, std: 0.0514, tweets: [["0.2399","november thanksgiving thanksgivingclapback picoftheday..."],["0.2283","print edition thanksgivingclapback..."],["0.2218","with all the controversies over oscarssowhite selmamovie im realizing..."],["0.2071","aunt all u do is stay on that spacebook me while ur husband stay on tinder thanksgivingclapback..."]]},
-  { movie: "Pineapple Express", year: 2008, cosine: 0.1743, mean: 0.1001, max: 0.2686, min: -0.0517, std: 0.0461, tweets: [["0.2686","oscarssowhite they dont see color illustration by victoria courtney..."],["0.2572","white on white good oscarssowhite graphic by the lat..."],["0.2468","hands down best article on oscars oscarssowhite oscarssomale..."],["0.2324","if you dont want another oscarssowhite go watch mcfarland usa..."]]},
-  { movie: "Ted", year: 2012, cosine: 0.1471, mean: 0.0845, max: 0.3340, min: -0.0860, std: 0.0523, tweets: [["0.3340","podcast with oscarssowhite arrow theflash doctorwho..."],["0.2909","rob rogers cartoon oscars oscarssowhite..."],["0.2417","uncle jimmy im leaving because i heard you were coming thanksgivingclapback..."],["0.2196","that adhd show presents oscarssowhite adhdshow..."]]},
-  { movie: "Tropic Thunder", year: 2008, cosine: 0.1872, mean: 0.1076, max: 0.3101, min: -0.0604, std: 0.0516, tweets: [["0.3101","selmas ava duvernay amp david oyelowo teaming up for hurricane katrina movie oscarssowhite..."],["0.2965","juno turned new england so white already a shooin for an oscar oscarssowhite..."],["0.2903","history vs movie selmamovie blacktwitter oscarssowhite americansniper..."],["0.2726","oscarssowhite they named the winter storm juno..."]]},
-];
-
-const maxDensity = 0.74;
-
-const ob = document.getElementById("overview-tbody");
-overviewData.forEach(([movie, words, terms, density, unique], i) => {
-  const pct = (density / maxDensity) * 100;
-  ob.innerHTML += `<tr><td class="rank">${i+1}</td><td class="movie-name">${movie}</td><td class="num">${words.toLocaleString()}</td><td class="num">${terms}</td><td class="num"><div class="bar-wrap"><span>${density.toFixed(2)}%</span><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div></div></td><td class="num">${unique}</td></tr>`;
-});
-
-const bm = document.getElementById("by-movie-content");
-byMovieData.forEach(d => {
-  bm.innerHTML += `<div class="movie-block"><h3>${d.title}</h3><p><span class="coverage">AAVE Coverage: ${d.coverage} of glossary</span></p><p class="terms-list"><strong style="color:#808080;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;">Unique Terms:</strong><br>${d.terms}</p></div>`;
-});
-
-const tt = document.getElementById("top-terms-content");
-topTermsData.forEach(d => {
-  const items = d.terms.map(([t,c]) => `<li><strong>${t}</strong> — ${c} occurrences</li>`).join("");
-  tt.innerHTML += `<div class="top-block"><h4>${d.title}</h4><ol>${items}</ol></div>`;
-});
-
-const sb = document.getElementById("sim-tbody");
-simData.forEach(d => {
-  const tweetItems = d.tweets.map(([score,text]) => `<li><strong>${score}</strong> – ${text}</li>`).join("");
-  sb.innerHTML += `<tr><td class="movie-name">${d.movie}</td><td>${d.year}</td><td class="sim-score">${d.cosine.toFixed(4)}</td><td>${d.mean.toFixed(4)}</td><td>${d.max.toFixed(4)}</td><td>${d.min.toFixed(4)}</td><td>${d.std.toFixed(4)}</td><td class="tweets-col"><ol>${tweetItems}</ol></td></tr>`;
-});
-
-function switchDataTab(idx) {
-  const wrap = document.querySelector(".wrap");
-  wrap.querySelectorAll(".panel").forEach((p,i) => p.classList.toggle("active", i === idx));
-  wrap.querySelectorAll(".tab-btn").forEach((b,i) => b.classList.toggle("active", i === idx));
-}
-</script>
-
-      </main>
-
-</div>
 <script>
-  // Navigate within the XP portfolio-frame iframe if we're inside it,
-  // otherwise fall back to a normal top-level navigation.
   function navTo(url) {
     try {
       const frame = window.parent.document.getElementById('portfolio-frame');
