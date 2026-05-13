@@ -188,248 +188,6 @@
       display: flex;
       justify-content: center;
     }
-
-    /* ══════════════════════════════════════════════════
-       🚧  UNDER CONSTRUCTION BANNER  🚧
-    ══════════════════════════════════════════════════ */
-    .wip-banner {
-      position: relative;
-      background: #000080; /* classic Win95 blue */
-      border: 4px solid;
-      border-color: #ffffff #808080 #808080 #ffffff; /* raised 3D effect */
-      margin-bottom: 18px;
-      padding: 0;
-      font-family: 'VT323', monospace;
-      overflow: hidden;
-    }
-
-    /* marching ants border animation */
-    .wip-banner::before {
-      content: '';
-      position: absolute;
-      inset: 3px;
-      border: 2px dashed #ffff00;
-      pointer-events: none;
-      animation: marchingAnts 0.5s linear infinite;
-      background: transparent;
-    }
-    @keyframes marchingAnts {
-      to { border-dashoffset: 20px; }
-    }
-
-    /* yellow/black hazard stripe top bar */
-    .wip-stripe {
-      height: 18px;
-      background: repeating-linear-gradient(
-        -45deg,
-        #ffcc00 0px, #ffcc00 10px,
-        #000000 10px, #000000 20px
-      );
-    }
-
-    .wip-inner {
-      padding: 14px 18px 16px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    /* the GIF column */
-    .wip-gif-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-
-    /* CSS-drawn "construction worker" figure — retro pixelart style */
-    .wip-figure {
-      width: 48px;
-      height: 64px;
-      position: relative;
-    }
-    /* hard hat */
-    .wip-figure::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 6px;
-      width: 36px; height: 14px;
-      background: #ff8800;
-      border-radius: 50% 50% 0 0;
-      border: 2px solid #cc6600;
-    }
-    /* body */
-    .wip-figure::after {
-      content: '';
-      position: absolute;
-      top: 16px; left: 10px;
-      width: 28px; height: 30px;
-      background: #ff8800;
-      border: 2px solid #cc6600;
-    }
-
-    .wip-shovel {
-      position: absolute;
-      top: 20px; left: -8px;
-      width: 6px; height: 34px;
-      background: #c8a060;
-      border: 1px solid #a07840;
-      transform: rotate(20deg);
-      transform-origin: top center;
-      animation: digAnim 0.6s ease-in-out infinite alternate;
-    }
-    @keyframes digAnim {
-      from { transform: rotate(20deg); }
-      to   { transform: rotate(-20deg); }
-    }
-
-    /* animated spinning gear */
-    .wip-gear {
-      font-size: 32px;
-      animation: spinGear 1.2s linear infinite;
-      display: inline-block;
-      filter: drop-shadow(0 0 4px #ffff00);
-    }
-    @keyframes spinGear { to { transform: rotate(360deg); } }
-
-    /* text content */
-    .wip-text-col {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .wip-title {
-      font-size: 28px;
-      color: #ffff00;
-      text-shadow: 2px 2px #ff0000;
-      letter-spacing: 2px;
-      line-height: 1;
-      animation: blink 1s step-start infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
-    }
-
-    .wip-subtitle {
-      font-size: 18px;
-      color: #ffffff;
-      margin-top: 6px;
-      line-height: 1.3;
-    }
-
-    .wip-note {
-      margin-top: 10px;
-      font-size: 15px;
-      color: #00ffff;
-      line-height: 1.4;
-    }
-
-    .wip-progress {
-      margin-top: 10px;
-    }
-    .wip-progress-label {
-      font-size: 14px;
-      color: #c0c0c0;
-      margin-bottom: 3px;
-    }
-    .wip-bar-outer {
-      width: 100%;
-      height: 16px;
-      background: #000033;
-      border: 2px solid #c0c0c0;
-      overflow: hidden;
-    }
-    .wip-bar-inner {
-      height: 100%;
-      width: 60%;
-      background: repeating-linear-gradient(
-        90deg,
-        #0000ff 0px, #0000ff 12px,
-        #4040ff 12px, #4040ff 24px
-      );
-      animation: loadBar 2s linear infinite;
-      background-size: 24px 100%;
-    }
-    @keyframes loadBar {
-      from { background-position: 0 0; }
-      to   { background-position: 24px 0; }
-    }
-
-    .wip-stamp {
-      margin-top: 10px;
-      display: inline-block;
-      font-size: 13px;
-      background: #ff0000;
-      color: #ffffff;
-      padding: 2px 8px;
-      border: 2px solid #ffff00;
-      letter-spacing: 1px;
-      transform: rotate(-2deg);
-    }
-
-    /* hazard stripe bottom */
-    .wip-stars {
-      height: 18px;
-      background: repeating-linear-gradient(
-        45deg,
-        #ffcc00 0px, #ffcc00 10px,
-        #000000 10px, #000000 20px
-      );
-    }
-
-    /* ── TABS (copied from original) ── */
-    .wrap { font-family: Monaco, monospace; padding: 1rem 0; }
-    .tab-bar { display: flex; gap: 0; margin-bottom: 0; border-bottom: 2px solid #6a3eb7; }
-    .tab-btn { background: rgba(38,37,79,0.6); border: 2px solid #6a3eb7; border-bottom: none; color: #f1f1f1; font-family: Monaco, monospace; font-size: 11px; padding: 7px 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.08em; margin-right: 4px; opacity: 0.6; }
-    .tab-btn.active { opacity: 1; color: #ea7af4; background: rgba(106,62,183,0.25); }
-    .tab-btn:hover { opacity: 1; }
-    fieldset { border: 2px solid #6a3eb7; margin: 0; padding: 0; }
-    legend { color: #ea7af4; font-size: 11px; padding: 0 8px; letter-spacing: 0.08em; text-transform: uppercase; }
-    .panel { display: none; }
-    .panel.active { display: block; }
-    table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    thead tr { border-bottom: 2px solid #6a3eb7; }
-    th { padding: 9px 10px; text-align: left; color: #ea7af4; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
-    td { padding: 8px 10px; border-bottom: 1px solid rgba(106,62,183,0.25); color: #f1f1f1; vertical-align: top; }
-    tr:last-child td { border-bottom: none; }
-    tbody tr:hover td { background: rgba(106,62,183,0.12); }
-    .num { text-align: right; font-variant-numeric: tabular-nums; }
-    .bar-wrap { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
-    .bar-bg { width: 50px; height: 5px; background: rgba(106,62,183,0.25); border-radius: 3px; overflow: hidden; }
-    .bar-fill { height: 100%; background: #ea7af4; border-radius: 3px; }
-    .movie-name { font-weight: 500; }
-    .rank { color: #b8a0d8; font-size: 10px; text-align: center; }
-    .movie-block { padding: 14px 0; border-bottom: 1px solid rgba(106,62,183,0.25); }
-    .movie-block:last-child { border-bottom: none; }
-    .movie-block h3 { margin: 0 0 6px; font-size: 13px; color: #ea7af4; }
-    .movie-block p { margin: 4px 0; font-size: 12px; }
-    .terms-list { font-size: 11px; color: #b8a0d8; margin: 4px 0 0; line-height: 1.6; }
-    .coverage { font-size: 11px; color: #ea7af4; font-weight: 500; }
-    .top-block { padding: 12px 0; border-bottom: 1px solid rgba(106,62,183,0.25); }
-    .top-block:last-child { border-bottom: none; }
-    .top-block h4 { margin: 0 0 8px; font-size: 12px; color: #ea7af4; }
-    .top-block ol { margin: 0; padding-left: 1.4em; font-size: 12px; }
-    .top-block li { margin-bottom: 3px; }
-    .top-block li strong { color: #ea7af4; }
-    .sim-table td:nth-child(n+3) { text-align: right; font-variant-numeric: tabular-nums; }
-    .sim-table th:nth-child(n+3) { text-align: right; }
-    .tweets-col { max-width: 280px; font-size: 11px; }
-    .tweets-col ol { margin: 0; padding-left: 1.2em; }
-    .tweets-col li { margin-bottom: 5px; line-height: 1.4; color: #b8a0d8; }
-    .tweets-col li strong { color: #ea7af4; }
-    .inner-pad { padding: 14px; }
-    .sim-score { color: #ea7af4; font-weight: 500; }
-
-    /* ── MOBILE ── */
-    @media (max-width: 800px) {
-      body { font-size: 14px; }
-      .layout { width: 100%; grid-template: "header" auto "main" auto "footer" auto / 1fr; }
-      aside { display: none; }
-      main { max-height: none; padding: 15px; }
-      .wip-inner { flex-direction: column; gap: 12px; }
     }
   </style>
 </head>
@@ -440,20 +198,20 @@
   <!-- HEADER -->
   <header>
     <div class="header-content">
-      <div class="header-title"><a href="../index.html" target="portfolio-frame" style="text-decoration:none;color:inherit;">Oriel's Portfolio</a></div>
+      <div class="header-title"><a href="#" onclick="navTo('../home.html');return false;" style="text-decoration:none;color:inherit;">Oriel's Portfolio</a></div>
       <nav>
         <ul>
-          <li><a href="../home.html" target="portfolio-frame">Home</a></li>
+          <li><a href="#" onclick="navTo('../home.html');return false;">Home</a></li>
           <li>
             <a href="#">Projects ▾</a>
             <ul>
               <li><a href="#">AAVE NLP (this page)</a></li>
-              <li><a href="../projects/qoz-geospatial.html">QOZ Analysis</a></li>
-              <li><a href="../projects/institutional-revenue.html">Institutional Revenue</a></li>
+              <li><a href="#" onclick="navTo('../projects/qoz-geospatial.html');return false;">QOZ Analysis</a></li>
+              <li><a href="#" onclick="navTo('../projects/institutional-revenue.html');return false;">Institutional Revenue</a></li>
             </ul>
           </li>
-          <li><a href="../resume.html" target="portfolio-frame">Resume</a></li>
-          <li><a href="../archive.html" target="portfolio-frame">Archive</a></li>
+          <li><a href="#" onclick="navTo('../resume.html');return false;">Resume</a></li>
+          <li><a href="#" onclick="navTo('../archive.html');return false;">Archive</a></li>
         </ul>
       </nav>
     </div>
@@ -487,9 +245,7 @@
   <!-- MAIN CONTENT -->
   <main id="content">
 
-    <!-- ═══════════════════════════════════════════
-         ACTUAL PROJECT CONTENT (from aave-nlp.html)
-    ═══════════════════════════════════════════ -->
+
 
     <section>
       <div class="project-tag">NLP</div>
@@ -634,14 +390,14 @@ individual_similarities = cosine_similarity(script_embedding, tweet_embeddings)[
       </ul>
 
       <hr />
-      <p><a href="../home.html">← Back to all projects</a></p>
+      <p><a href="#" onclick="navTo('../home.html');return false;">← Back to all projects</a></p>
     </section>
 
   </main>
 
   <!-- FOOTER -->
   <footer>
-    <div>Oriel Mwaniki-Alexander · MS Data Analysis &amp; Visualization · Pratt Institute · <span style="color:#ea7af4;">[STAGING BUILD — not for distribution]</span></div>
+    <div>Oriel Mwaniki-Alexander · MS Data Analysis &amp; Visualization · Pratt Institute</div>
   </footer>
 
 </div>
@@ -735,5 +491,16 @@ function switchDataTab(idx) {
       </main>
 
 </div>
+<script>
+  // Navigate within the XP portfolio-frame iframe if we're inside it,
+  // otherwise fall back to a normal top-level navigation.
+  function navTo(url) {
+    try {
+      const frame = window.parent.document.getElementById('portfolio-frame');
+      if (frame) { frame.src = url; return; }
+    } catch(e) {}
+    window.location.href = url;
+  }
+</script>
 </body>
 </html>
