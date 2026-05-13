@@ -16,10 +16,10 @@ function headerHTML() {
   return `
       <header>
         <div class="header-content">
-          <div class="header-title"><a href="${nesting}index.html" target="_top" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
+          <div class="header-title"><a href="${nesting}index.html" target="portfolio-frame" style="text-decoration:none; color:inherit;">Oriel's Portfolio</a></div>
           <nav>
             <ul>
-              <li><a href="${nesting}home.html" target="_top">Home</a></li>
+              <li><a href="${nesting}home.html" target="portfolio-frame">Home</a></li>
               <li class="dropdown">
                 <a href="#">Projects ▾</a>
                 <ul class="dropdown-menu">
@@ -28,8 +28,8 @@ function headerHTML() {
                   <li><a href="${nesting}projects/institutional-revenue.html">Institutional Revenue</a></li>
                 </ul>
               </li>
-              <li><a href="${nesting}resume.html" target="_top">Resume</a></li>
-              <li><a href="${nesting}archive.html" target="_top">Archive</a></li>
+              <li><a href="${nesting}resume.html" target="portfolio-frame">Resume</a></li>
+              <li><a href="${nesting}archive.html" target="portfolio-frame">Archive</a></li>
             </ul>
           </nav>
         </div>
