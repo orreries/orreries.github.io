@@ -80,6 +80,23 @@ a:focus {
   text-decoration: none;
 }
 
+/* Scrollbars: */
+/* Standard — Firefox + modern browsers */
+html {
+  scrollbar-width: thin;              /* auto | thin | none */
+  scrollbar-color: #7c3aed #1a1a1a;   /* thumb  track */
+}
+
+/* WebKit — more control */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #1a1a1a; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#7c3aed, #5646ce);
+  border-radius: 999px;
+  border: 2px solid #1a1a1a;   /* fakes padding around the thumb */
+}
+::-webkit-scrollbar-thumb:hover { background: #9f67ff; }
+
 /* -------------------------------------------------------- */
 /* LAYOUT */
 /* -------------------------------------------------------- */
